@@ -1,0 +1,12 @@
+<!DOCTYPE web-app PUBLIC
+ "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+ "http://java.sun.com/dtd/web-app_2_3.dtd" >
+
+<web-app>
+  <display-name>Restful Web Application</display-name>
+
+  <context-param>
+      <param-name>resteasy.providers</param-name>
+      <param-value>org.codehaus.jackson.jaxrs.JacksonJsonProvider</param-value>
+  </context-param>
+</web-app>
