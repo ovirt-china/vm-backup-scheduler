@@ -1,5 +1,6 @@
 package org.ovirtChina.enginePlugin.vmBackupScheduler.dao;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.jdbc.core.RowMapper;
@@ -13,8 +14,8 @@ public abstract class CrudDAO<T> implements DAO<T>{
     }
 
     public T get(UUID id) {
-        DbFacade.getInstance().executeReadList("get" + entityName + "ById", instance, createIdParametersMapper(id));
-        return null;
+        List<T> result = (List<T>)DbFacade.getInstance().executeReadList("get" + entityName + "ById", instance, createIdParametersMapper(id));
+        return result.get(0);
     }
 
     public void update(T value) {

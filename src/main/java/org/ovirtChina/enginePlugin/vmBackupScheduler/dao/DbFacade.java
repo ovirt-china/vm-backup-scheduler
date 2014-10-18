@@ -9,6 +9,9 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 
+import org.ovirtChina.enginePlugin.vmBackupScheduler.common.Task;
+import org.ovirtChina.enginePlugin.vmBackupScheduler.common.VmPolicy;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSourceUtils;
@@ -16,10 +19,13 @@ import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 
 public class DbFacade {
     private static DbFacade instance;
+    private static DataSource ds;
+    private static JdbcTemplate template;
 
     private ConcurrentMap<String, SimpleJdbcCall> callsMap =
             new ConcurrentHashMap<String, SimpleJdbcCall>();
-    private static DataSource ds;
+    private DAO<Task> taskDAO;
+    private DAO<VmPolicy> vmPolicyDAO;
 
     public static DataSource locateDataSource() throws NamingException {
         InitialContext cxt = new InitialContext();
@@ -60,7 +66,7 @@ public class DbFacade {
             final MapSqlParameterSource parameterSource) {
 
                 SimpleJdbcCall call =
-                        (SimpleJdbcCall) new SimpleJdbcCall(ds).withProcedureName(procedureName);
+                        (SimpleJdbcCall) new PostgresSimpleJdbcCall(template).withProcedureName(procedureName);
                 call.returningResultSet("RETURN_VALUE", mapper);
                 // Pass mapper information (only parameter names) in order to supply all the needed
                 // metadata information for compilation.
@@ -75,8 +81,28 @@ public class DbFacade {
 
     public static DbFacade getInstance() {
         if (instance == null) {
-            return new DbFacade();
+            instance = new DbFacade();
+            template = new PostgresJdbcTemplate(ds);
+            instance.setTaskDAO(new TaskDAOImpl());
+            instance.setVmPolicyDAO(new VmPolicyDAOImpl());
+            return instance;
         }
         return instance;
     }
+
+	public DAO<Task> getTaskDAO() {
+		return taskDAO;
+	}
+
+	public void setTaskDAO(DAO<Task> taskDAO) {
+		this.taskDAO = taskDAO;
+	}
+
+	public DAO<VmPolicy> getVmPolicyDAO() {
+		return vmPolicyDAO;
+	}
+
+	public void setVmPolicyDAO(DAO<VmPolicy> vmPolicyDAO) {
+		this.vmPolicyDAO = vmPolicyDAO;
+	}
 }
