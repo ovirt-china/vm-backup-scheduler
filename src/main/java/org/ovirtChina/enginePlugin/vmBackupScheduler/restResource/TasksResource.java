@@ -12,36 +12,37 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
-import org.ovirtChina.enginePlugin.vmBackupScheduler.common.VmPolicy;
+import org.ovirtChina.enginePlugin.vmBackupScheduler.common.Task;
 import org.ovirtChina.enginePlugin.vmBackupScheduler.dao.DbFacade;
 
-@Path("/vmPolicies")
+@Path("/tasks")
 @Produces({BackendApplication.ApplicationJson})
-public class VmPolicyResource {
+public class TasksResource {
 
     @POST
-    public Response add(VmPolicy vmPolicy) {
-        DbFacade.getInstance().getVmPolicyDAO().save(vmPolicy);
-		return Response.status(Response.Status.ACCEPTED).build();
+    @Consumes({BackendApplication.ApplicationJson})
+    public Response add(Task task) {
+        DbFacade.getInstance().getTaskDAO().save(task);
+        return Response.status(Response.Status.ACCEPTED).build();
     }
 
     @GET
     @Path("{id}")
-    public VmPolicy getVmPolicyById(@PathParam("id") String id) {
-        return DbFacade.getInstance().getVmPolicyDAO().get(UUID.fromString(id));
+    public Task getTaskByID(@PathParam("id") String id) {
+        return DbFacade.getInstance().getTaskDAO().get(UUID.fromString(id));
     }
 
     @PUT
     @Consumes({BackendApplication.ApplicationJson})
-    public Response updateVmPolicy(VmPolicy vmPolicy) {
-        DbFacade.getInstance().getVmPolicyDAO().update(vmPolicy);
+    public Response updateTask(Task task) {
+        DbFacade.getInstance().getTaskDAO().update(task);
         return Response.status(Response.Status.OK).build();
     }
 
     @DELETE
     @Path("{id}")
-    public Response removeVmPolicy(@PathParam("id") String id) {
-        DbFacade.getInstance().getVmPolicyDAO().delete(UUID.fromString(id));
+    public Response removeTask(@PathParam("id") String id) {
+        DbFacade.getInstance().getTaskDAO().delete(UUID.fromString(id));
         return Response.status(Response.Status.OK).build();
     }
 }
