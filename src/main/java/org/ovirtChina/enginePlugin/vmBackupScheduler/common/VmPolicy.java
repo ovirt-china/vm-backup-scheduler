@@ -4,10 +4,10 @@ import java.util.UUID;
 
 public class VmPolicy {
     private UUID vmID;
-    private BackupMethod backupMethod;
-    private TimeOfDay timeOfDay;
-    private WeekDays weekDays;
-    private AutoDeleteReservePolicy autoDeleteReservePolicy;
+    private int backupMethod;
+    private String timeOfDay;
+    private String weekDays;
+    private int autoDeleteReservePolicy;
     private int autoDeleteReserveAmount;
 
     public UUID getVmID() {
@@ -18,11 +18,11 @@ public class VmPolicy {
         this.vmID = vmID;
     }
 
-    public BackupMethod getBackupMethod() {
+    public int getBackupMethod() {
         return backupMethod;
     }
 
-    public void setBackupMethod(BackupMethod backupMethod) {
+    public void setBackupMethod(int backupMethod) {
         this.backupMethod = backupMethod;
     }
 
@@ -31,7 +31,7 @@ public class VmPolicy {
     }
 
     public void setTimeOfDay(String timeOfDay) {
-        this.timeOfDay = TimeOfDay.parseTimeOfDay(timeOfDay);
+        this.timeOfDay = timeOfDay;
     }
 
     public String getWeekDays() {
@@ -39,15 +39,15 @@ public class VmPolicy {
     }
 
     public void setWeekDays(String weekDays) {
-        this.weekDays = WeekDays.parseWeeekDays(weekDays);
+        this.weekDays = weekDays;
     }
 
-    public AutoDeleteReservePolicy getAutoDeleteReservePolicy() {
+    public int getAutoDeleteReservePolicy() {
         return autoDeleteReservePolicy;
     }
 
     public void setAutoDeleteReservePolicy(
-            AutoDeleteReservePolicy autoDeleteReservePolicy) {
+            int autoDeleteReservePolicy) {
         this.autoDeleteReservePolicy = autoDeleteReservePolicy;
     }
 
@@ -59,8 +59,11 @@ public class VmPolicy {
         this.autoDeleteReserveAmount = autoDeleteReserveAmount;
     }
 
-    public VmPolicy(UUID vmID, BackupMethod backupMethod, TimeOfDay timeOfDay,
-            WeekDays weekDays, AutoDeleteReservePolicy autoDeleteReservePolicy,
+    public VmPolicy() {
+    }
+
+    public VmPolicy(UUID vmID, int backupMethod, String timeOfDay,
+            String weekDays, int autoDeleteReservePolicy,
             int autoDeleteReserveAmount) {
         super();
         this.vmID = vmID;
