@@ -4,6 +4,7 @@ import java.util.UUID;
 
 public class Task {
     private UUID vmID;
+    private int taskStatus;
     private int taskType;
     private String backupName;
 
@@ -13,6 +14,14 @@ public class Task {
 
     public void setVmID(UUID vmID) {
         this.vmID = vmID;
+    }
+
+    public int getTaskStatus() {
+        return taskStatus;
+    }
+
+    public void setTaskStatus(int taskStatus) {
+        this.taskStatus = taskStatus;
     }
 
     public int getTaskType() {
@@ -34,9 +43,10 @@ public class Task {
     public Task() {
     }
 
-    public Task(UUID vmID, int taskType, String backupName) {
+    public Task(UUID vmID, int taskStatus, int taskType, String backupName) {
         super();
         this.vmID = vmID;
+        this.taskStatus = taskStatus;
         this.taskType = taskType;
         this.backupName = backupName;
     }

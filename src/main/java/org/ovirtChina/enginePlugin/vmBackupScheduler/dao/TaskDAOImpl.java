@@ -15,6 +15,7 @@ public class TaskDAOImpl extends CrudDAO<Task>{
 
             public Task mapRow(ResultSet rs, int rowNum) throws SQLException {
                 return new Task(((UUID)rs.getObject("id")),
+                    rs.getInt("task_status"),
                     rs.getInt("task_type"),
                     rs.getString("backup_name"));
             }
@@ -24,6 +25,7 @@ public class TaskDAOImpl extends CrudDAO<Task>{
 
     public MapSqlParameterSource createFullParametersMapper(Task task) {
         return new MapSqlParameterSource().addValue("v_id", task.getVmID())
+                .addValue("v_task_status", task.getTaskStatus())
                 .addValue("v_task_type", task.getTaskType())
                 .addValue("v_backup_name", task.getBackupName());
     }
