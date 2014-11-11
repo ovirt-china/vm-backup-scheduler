@@ -33,8 +33,7 @@ public class VmPolicyResource {
     @PUT
     @Consumes({BackendApplication.ApplicationJson})
     public Response updateVmPolicy(VmPolicy vmPolicy) {
-        DbFacade.getInstance().getVmPolicyDAO().update(vmPolicy);
-        return Response.status(Response.Status.OK).build();
+        return addOrUpdateVmPolicy(vmPolicy);
     }
 
     @DELETE
