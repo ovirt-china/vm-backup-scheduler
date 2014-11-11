@@ -15,6 +15,7 @@ public class VmPolicyDAOImpl extends CrudDAO<VmPolicy>{
 
             public VmPolicy mapRow(ResultSet rs, int rowNum) throws SQLException {
                 return new VmPolicy(((UUID) rs.getObject("id")),
+                        rs.getBoolean("enabled"),
                         rs.getInt("backup_method"),
                         rs.getString("time_of_day"),
                         rs.getString("week_days"),
@@ -27,6 +28,7 @@ public class VmPolicyDAOImpl extends CrudDAO<VmPolicy>{
 
     public MapSqlParameterSource createFullParametersMapper(VmPolicy vmPolicy) {
         return new MapSqlParameterSource().addValue("v_id", vmPolicy.getVmID())
+                .addValue("v_enabled", vmPolicy.isEnabled())
                 .addValue("v_backup_method", vmPolicy.getBackupMethod())
                 .addValue("v_time_of_day", vmPolicy.getTimeOfDay().toString())
                 .addValue("v_week_days", vmPolicy.getWeekDays().toString())

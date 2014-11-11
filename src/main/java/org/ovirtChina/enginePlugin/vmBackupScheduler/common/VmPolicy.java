@@ -4,6 +4,7 @@ import java.util.UUID;
 
 public class VmPolicy {
     private UUID vmID;
+    private boolean enabled;
     private int backupMethod;
     private String timeOfDay;
     private String weekDays;
@@ -16,6 +17,14 @@ public class VmPolicy {
 
     public void setVmID(UUID vmID) {
         this.vmID = vmID;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 
     public int getBackupMethod() {
@@ -59,14 +68,12 @@ public class VmPolicy {
         this.autoDeleteReserveAmount = autoDeleteReserveAmount;
     }
 
-    public VmPolicy() {
-    }
-
-    public VmPolicy(UUID vmID, int backupMethod, String timeOfDay,
+    public VmPolicy(UUID vmID, boolean enabled, int backupMethod, String timeOfDay,
             String weekDays, int autoDeleteReservePolicy,
             int autoDeleteReserveAmount) {
         super();
         this.vmID = vmID;
+        this.enabled = enabled;
         this.backupMethod = backupMethod;
         this.timeOfDay = timeOfDay;
         this.weekDays = weekDays;
