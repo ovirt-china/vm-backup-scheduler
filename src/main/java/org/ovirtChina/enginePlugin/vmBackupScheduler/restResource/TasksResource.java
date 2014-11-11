@@ -22,8 +22,7 @@ public class TasksResource {
     @POST
     @Consumes({BackendApplication.ApplicationJson})
     public Response add(Task task) {
-        DbFacade.getInstance().getTaskDAO().save(task);
-        return Response.status(Response.Status.ACCEPTED).build();
+        return addOrUpdateTask(task);
     }
 
     @GET
@@ -35,14 +34,23 @@ public class TasksResource {
     @PUT
     @Consumes({BackendApplication.ApplicationJson})
     public Response updateTask(Task task) {
-        DbFacade.getInstance().getTaskDAO().update(task);
-        return Response.status(Response.Status.OK).build();
+        return addOrUpdateTask(task);
     }
 
     @DELETE
     @Path("{id}")
     public Response removeTask(@PathParam("id") String id) {
         DbFacade.getInstance().getTaskDAO().delete(UUID.fromString(id));
+        return Response.status(Response.Status.OK).build();
+    }
+
+    private Response addOrUpdateTask(Task task) {
+        Task tmpTask = DbFacade.getInstance().getTaskDAO().get(task.getVmID());
+        if (tmpTask != null) {
+            DbFacade.getInstance().getTaskDAO().update(task);
+        } else {
+            DbFacade.getInstance().getTaskDAO().save(task);
+        }
         return Response.status(Response.Status.OK).build();
     }
 }

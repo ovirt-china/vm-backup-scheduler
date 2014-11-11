@@ -21,8 +21,7 @@ public class VmPolicyResource {
 
     @POST
     public Response add(VmPolicy vmPolicy) {
-        DbFacade.getInstance().getVmPolicyDAO().save(vmPolicy);
-		return Response.status(Response.Status.ACCEPTED).build();
+		return addOrUpdateVmPolicy(vmPolicy);
     }
 
     @GET
@@ -43,5 +42,15 @@ public class VmPolicyResource {
     public Response removeVmPolicy(@PathParam("id") String id) {
         DbFacade.getInstance().getVmPolicyDAO().delete(UUID.fromString(id));
         return Response.status(Response.Status.OK).build();
+    }
+
+    private Response addOrUpdateVmPolicy(VmPolicy vmPolicy) {
+        VmPolicy tmpVmPolicy = DbFacade.getInstance().getVmPolicyDAO().get(vmPolicy.getVmID());
+        if (tmpVmPolicy != null) {
+            DbFacade.getInstance().getVmPolicyDAO().update(vmPolicy);
+        } else {
+            DbFacade.getInstance().getVmPolicyDAO().save(vmPolicy);
+        }
+        return null;
     }
 }
