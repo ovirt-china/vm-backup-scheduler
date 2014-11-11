@@ -15,7 +15,10 @@ public abstract class CrudDAO<T> implements DAO<T>{
 
     public T get(UUID id) {
         List<T> result = (List<T>)DbFacade.getInstance().executeReadList("get" + entityName + "ById", instance, createIdParametersMapper(id));
-        return result.get(0);
+        if (result != null) {
+            return result.get(0);
+        }
+        return null;
     }
 
     public void update(T value) {
