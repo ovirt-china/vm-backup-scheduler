@@ -21,11 +21,6 @@ public class BackendApplication extends Application {
     }
 
     public BackendApplication() {
-        try {
-			DbFacade.locateDataSource();
-		} catch (NamingException e) {
-			System.out.println("Error locating datasource.");
-		}
         singletons.add(new TasksResource());
         singletons.add(new VmPolicyResource());
     }
