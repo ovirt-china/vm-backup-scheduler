@@ -68,6 +68,9 @@ public class VmPolicy {
         this.autoDeleteReserveAmount = autoDeleteReserveAmount;
     }
 
+    public VmPolicy() {
+    }
+
     public VmPolicy(UUID vmID, boolean enabled, int backupMethod, String timeOfDay,
             String weekDays, int autoDeleteReservePolicy,
             int autoDeleteReserveAmount) {
