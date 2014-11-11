@@ -2,6 +2,7 @@ package org.ovirtChina.enginePlugin.vmBackupScheduler.dao;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.UUID;
 
 import org.ovirtChina.enginePlugin.vmBackupScheduler.common.VmPolicy;
@@ -9,6 +10,10 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 
 public class VmPolicyDAOImpl extends CrudDAO<VmPolicy>{
+
+    public List<VmPolicy> getScheduleVms() {
+        return DbFacade.getInstance().executeReadList("getScheduleVms", instance, null);
+    }
 
     public VmPolicyDAOImpl() {
         instance = new RowMapper<VmPolicy>() {
