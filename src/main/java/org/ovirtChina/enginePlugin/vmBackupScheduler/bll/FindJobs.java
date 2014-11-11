@@ -23,8 +23,8 @@ public class FindJobs extends TimerTask {
         for (VmPolicy policy : policies) {
             if (!policy.getWeekDays().isEmpty() && policy.getWeekDays().indexOf(dayOfWeek) != '0'
                     || policy.getWeekDays().isEmpty()) {
-                if (policy.isEnabled()) {
-                    // check prev task status
+                if (policy.isEnabled()
+                        && DbFacade.getInstance().getTaskDAO().get(policy.getVmID()) == null) {
                     DbFacade.getInstance().getTaskDAO().save(
                             new Task(policy.getVmID(), TaskStatus.WAITING.getValue(), policy.getBackupMethod(), null));
                 }
