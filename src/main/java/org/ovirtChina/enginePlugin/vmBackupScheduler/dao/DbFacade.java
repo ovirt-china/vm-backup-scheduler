@@ -9,8 +9,6 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 
-import org.ovirtChina.enginePlugin.vmBackupScheduler.common.Task;
-import org.ovirtChina.enginePlugin.vmBackupScheduler.common.VmPolicy;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -24,8 +22,8 @@ public class DbFacade {
 
     private ConcurrentMap<String, SimpleJdbcCall> callsMap =
             new ConcurrentHashMap<String, SimpleJdbcCall>();
-    private DAO<Task> taskDAO;
-    private DAO<VmPolicy> vmPolicyDAO;
+    private TaskDAOImpl taskDAO;
+    private VmPolicyDAOImpl vmPolicyDAO;
 
     public static DataSource locateDataSource() throws NamingException {
         InitialContext cxt = new InitialContext();
@@ -90,19 +88,19 @@ public class DbFacade {
         return instance;
     }
 
-	public DAO<Task> getTaskDAO() {
+	public TaskDAOImpl getTaskDAO() {
 		return taskDAO;
 	}
 
-	public void setTaskDAO(DAO<Task> taskDAO) {
+	public void setTaskDAO(TaskDAOImpl taskDAO) {
 		this.taskDAO = taskDAO;
 	}
 
-	public DAO<VmPolicy> getVmPolicyDAO() {
+	public VmPolicyDAOImpl getVmPolicyDAO() {
 		return vmPolicyDAO;
 	}
 
-	public void setVmPolicyDAO(DAO<VmPolicy> vmPolicyDAO) {
+	public void setVmPolicyDAO(VmPolicyDAOImpl vmPolicyDAO) {
 		this.vmPolicyDAO = vmPolicyDAO;
 	}
 }
