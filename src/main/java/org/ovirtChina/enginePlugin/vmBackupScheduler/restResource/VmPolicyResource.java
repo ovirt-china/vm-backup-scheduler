@@ -2,21 +2,18 @@ package org.ovirtChina.enginePlugin.vmBackupScheduler.restResource;
 
 import java.util.UUID;
 
-import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
 import org.ovirtChina.enginePlugin.vmBackupScheduler.common.VmPolicy;
 import org.ovirtChina.enginePlugin.vmBackupScheduler.dao.DbFacade;
 
 @Path("/vmPolicies")
-@Produces({BackendApplication.ApplicationJson})
 public class VmPolicyResource {
 
     @POST
@@ -31,7 +28,6 @@ public class VmPolicyResource {
     }
 
     @PUT
-    @Consumes({BackendApplication.ApplicationJson})
     public Response updateVmPolicy(VmPolicy vmPolicy) {
         return addOrUpdateVmPolicy(vmPolicy);
     }

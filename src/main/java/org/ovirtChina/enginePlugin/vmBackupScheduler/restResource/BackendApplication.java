@@ -11,7 +11,6 @@ import org.ovirtChina.enginePlugin.vmBackupScheduler.dao.DbFacade;
 
 @ApplicationPath("/")
 public class BackendApplication extends Application {
-    public final static String ApplicationJson = "application/json";
 
     private final Set<Object> singletons = new HashSet<Object>();
 
