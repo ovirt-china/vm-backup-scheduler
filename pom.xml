@@ -50,5 +50,10 @@
       <artifactId>jboss-ejb-api_3.1_spec</artifactId>
       <version>1.0.1.Final</version>
     </dependency>
+    <dependency>
+      <groupId>org.ovirt.engine.sdk</groupId>
+      <artifactId>ovirt-engine-sdk-java</artifactId>
+      <version>3.4.4.0</version>
+    </dependency>
   </dependencies>
 </project>
