@@ -1,5 +1,6 @@
 package org.ovirtChina.enginePlugin.vmBackupScheduler.common;
 
+import java.util.Date;
 import java.util.UUID;
 
 public class Task {
@@ -7,6 +8,8 @@ public class Task {
     private int taskStatus;
     private int taskType;
     private String backupName;
+    private Date createTime;
+    private Date lastUpdate;
 
     public UUID getVmID() {
         return vmID;
@@ -40,14 +43,32 @@ public class Task {
         this.backupName = backupName;
     }
 
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
+
+    public Date getLastUpdate() {
+        return lastUpdate;
+    }
+
+    public void setLastUpdate(Date lastUpdate) {
+        this.lastUpdate = lastUpdate;
+    }
+
     public Task() {
     }
 
-    public Task(UUID vmID, int taskStatus, int taskType, String backupName) {
+    public Task(UUID vmID, int taskStatus, int taskType, String backupName, Date createTime, Date lastUpdate) {
         super();
         this.vmID = vmID;
         this.taskStatus = taskStatus;
         this.taskType = taskType;
         this.backupName = backupName;
+        this.createTime = createTime;
+        this.lastUpdate = lastUpdate;
     }
 }

@@ -26,7 +26,7 @@ public class FindJobs extends TimerTask {
                 if (policy.isEnabled()
                         && DbFacade.getInstance().getTaskDAO().get(policy.getVmID()) == null) {
                     DbFacade.getInstance().getTaskDAO().save(
-                            new Task(policy.getVmID(), TaskStatus.WAITING.getValue(), policy.getBackupMethod(), null));
+                            new Task(policy.getVmID(), TaskStatus.WAITING.getValue(), policy.getBackupMethod(), null, now, now));
                 }
             }
         }

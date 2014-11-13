@@ -17,7 +17,9 @@ public class TaskDAOImpl extends CrudDAO<Task>{
                 return new Task(((UUID)rs.getObject("id")),
                     rs.getInt("task_status"),
                     rs.getInt("task_type"),
-                    rs.getString("backup_name"));
+                    rs.getString("backup_name"),
+                    rs.getDate("create_time"),
+                    rs.getDate("last_update"));
             }
         };
         entityName = "Task";
@@ -27,7 +29,9 @@ public class TaskDAOImpl extends CrudDAO<Task>{
         return new MapSqlParameterSource().addValue("v_id", task.getVmID())
                 .addValue("v_task_status", task.getTaskStatus())
                 .addValue("v_task_type", task.getTaskType())
-                .addValue("v_backup_name", task.getBackupName());
+                .addValue("v_backup_name", task.getBackupName())
+                .addValue("v_create_time", task.getCreateTime())
+                .addValue("v_last_update", task.getLastUpdate());
     }
 
     public MapSqlParameterSource createIdParametersMapper(UUID id) {
