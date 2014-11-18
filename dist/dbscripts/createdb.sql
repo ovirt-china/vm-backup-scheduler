@@ -53,12 +53,14 @@ DROP FUNCTION public.create_plpgsql_language ();
 CREATE OR REPLACE FUNCTION saveTask(v_id UUID,
   v_task_status INTEGER,
   v_task_type INTEGER,
-  v_backup_name VARCHAR(255))
+  v_backup_name VARCHAR(255),
+  v_create_time timestamp,
+  v_last_update timestamp)
 RETURNS VOID
   AS $procedure$
 BEGIN
-  INSERT INTO tasks(id, task_status, task_type, backup_name)
-  VALUES(v_id, v_task_status, v_task_type, v_backup_name);
+  INSERT INTO tasks(id, task_status, task_type, backup_name, create_time, last_update)
+  VALUES(v_id, v_task_status, v_task_type, v_backup_name, v_create_time, v_last_update);
 
 END; $procedure$
 LANGUAGE plpgsql;
