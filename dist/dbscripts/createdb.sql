@@ -86,6 +86,22 @@ END; $procedure$
 LANGUAGE plpgsql;
 
 
+CREATE OR REPLACE FUNCTION getOldestTaskTypeWithStatus(
+  v_task_type INTEGER,
+  v_task_status INTEGER)
+RETURNS SETOF task STABLE
+  AS $procedure$
+BEGIN
+RETURN QUERY SELECT *
+             FROM tasks task
+             WHERE task.task_type = v_task_type
+             AND task.task_status = v_task_status
+             ORDER BY task.create_time DESC
+             LIMIT 1;
+END; $procedure$
+LANGUAGE plpgsql;
+
+
 CREATE OR REPLACE FUNCTION updateTask(v_id UUID,
   v_task_status INTEGER,
   v_task_type INTEGER,

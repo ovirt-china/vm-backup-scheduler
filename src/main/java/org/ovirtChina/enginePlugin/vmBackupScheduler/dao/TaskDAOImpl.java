@@ -2,13 +2,26 @@ package org.ovirtChina.enginePlugin.vmBackupScheduler.dao;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.UUID;
 
 import org.ovirtChina.enginePlugin.vmBackupScheduler.common.Task;
+import org.ovirtChina.enginePlugin.vmBackupScheduler.common.TaskStatus;
+import org.ovirtChina.enginePlugin.vmBackupScheduler.common.TaskType;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 
 public class TaskDAOImpl extends CrudDAO<Task>{
+
+    public Task getOldestTaskTypeWithStatus(TaskType taskType, TaskStatus taskStatus) {
+        List<Task> result = DbFacade.getInstance().executeReadList("getOldestTaskTypeWithStatus", instance, new MapSqlParameterSource()
+                .addValue("v_task_type", taskType.getValue())
+                .addValue("v_task_status", taskStatus.getValue()));
+        if (result != null && result.size() > 0) {
+            return result.get(0);
+        }
+        return null;
+    }
 
     public TaskDAOImpl() {
         instance = new RowMapper<Task>() {
