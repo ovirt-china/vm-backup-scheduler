@@ -8,17 +8,20 @@ import javax.ejb.Startup;
 import javax.naming.NamingException;
 
 import org.ovirtChina.enginePlugin.vmBackupScheduler.dao.DbFacade;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Singleton(name = "Scheduler")
 @Startup
 public class Backend{
+    private static Logger log = LoggerFactory.getLogger(Backend.class);
 
     @PostConstruct
     public void init() {
         try {
             DbFacade.locateDataSource();
         } catch (NamingException e) {
-            System.out.println("Error locating datasource.");
+            log.error("Error locating datasource.");
         }
         Timer timer = new Timer();
         timer.schedule(new FindJobs(), 0, 5000);
