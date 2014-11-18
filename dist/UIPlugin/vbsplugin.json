@@ -1,0 +1,10 @@
+{
+  // Unique name of the plugin 
+   "name": "VBSPlugin", 
+
+  // Url of plugin host page that bootstraps plugin code 
+  "url": "plugin/VBSPlugin/index.html", 
+
+  // Path to plugin resource files relative to descriptor 
+  "resourcePath": "vbsplugin-resources" 
+}

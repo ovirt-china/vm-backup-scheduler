@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html ng-app="resultPage">
+<head>
+  <link rel="stylesheet" href="patternfly/css/patternfly.min.css">
+</head>
+<body onload="initData()">
+<script src="js/jquery-1.11.1.min.js" language="javascript"></script>
+<script src="patternfly/components/bootstrap-select/bootstrap-select.min.js"></script>
+<script>
+  // Initialize Boostrap-select
+  $('.selectpicker').selectpicker();
+</script>
+<select id="backupMethod" class="selectpicker">
+  <option value="0">增量备份（快照）</option>
+  <option value="1">完全备份</option>
+</select>
+<input id="enabled" type="checkbox"/>启用
+<div>
+  <div>
+    备份周期：
+    <select id="cycle" class="selectpicker">
+      <option value="week">按周</option>
+      <option value="day">按天</option>
+    </select>
+    时间：
+    <input id="hour" type="text" value="" name="hour">时
+    <input id="minute" type="text" value="" name="minute">分
+  </div>
+  <div>
+    <label class="checkbox-inline"><input type="checkbox" id="monday" class="checkbox">星期一</input></label>
+    <label class="checkbox-inline"><input type="checkbox" id="tuesday" class="checkbox">星期二</input></label>
+    <label class="checkbox-inline"><input type="checkbox" id="wensday" class="checkbox">星期三</input></label>
+    <label class="checkbox-inline"><input type="checkbox" id="thusday" class="checkbox">星期四</input></label>
+    <label class="checkbox-inline"><input type="checkbox" id="friday" class="checkbox">星期五</input></label>
+    <label class="checkbox-inline"><input type="checkbox" id="sartuday" class="checkbox">星期六</input></label>
+    <label class="checkbox-inline"><input type="checkbox" id="sunday" class="checkbox">星期日</input></label>
+  </div>
+  <div>
+    <label class="radio-inline"><input type="radio" value="0" name="keepPolicy" class="checkbox">保留备份数：</input></label>
+    <label class="text-inline"><input type="text" id="keepnumnum" class="checkbox"></input></label>
+    <label class="radio-inline"><input type="radio" value="1" name="keepPolicy" class="checkbox">保留备份天数：</input></label>
+    <label class="text-inline"><input type="text" id="keepdaynum" class="checkbox"></input></label>
+  </div>
+  <button type="button" class="btn btn-default" onclick="save()">Save</button>
+  <script>
+    function save() {
+      var data = {};
+      data["vmID"] = window.location.href.split("#")[1];
+      data["enabled"] = $("#enabled").is(":checked") ? "true" : "false";
+      data["backupMethod"] = $("#backupMethod").val();
+      data["timeOfDay"] = $("#hour").val() + ":" + $("#minute").val()
+      var autoDeleteReservePolicy = $('input:radio[name=keepPolicy]:checked').val();
+      data["autoDeleteReservePolicy"] = autoDeleteReservePolicy;
+      if (autoDeleteReservePolicy == "0") {
+        data["autoDeleteReserveAmount"] = $("#keepnumnum").val();
+      } else {
+        data["autoDeleteReserveAmount"] = $("#keepdaynum").val();
+      }
+      if ($("#cycle").val() == "week") {
+        data["weekDays"] = getWeekDays();
+      } else {
+        data["weekDays"] = "";
+      }
+      $.ajax({
+        type: "POST",
+        url: "/vmBackupScheduler/vmPolicies",
+        headers: {"Content-Type":"application/json"},
+        data: JSON.stringify(data),
+        success: function(data) {
+          alert("saved.");
+        }
+      });
+    }
+
+    function getWeekDays() {
+      var weekdays = "";
+      weekdays += $("#monday").is(":checked") ? "1" : "0";
+      weekdays += $("#tuesday").is(":checked") ? "1" : "0";
+      weekdays += $("#wensday").is(":checked") ? "1" : "0";
+      weekdays += $("#thusday").is(":checked") ? "1" : "0";
+      weekdays += $("#friday").is(":checked") ? "1" : "0";
+      weekdays += $("#sartuday").is(":checked") ? "1" : "0";
+      weekdays += $("#sunday").is(":checked") ? "1" : "0";
+      return weekdays;
+    }
+
+    function setWeekDays(weekdays) {
+      $("#monday").prop("checked", weekdays[0] == "1" ? true : false);
+      $("#tuesday").prop("checked", weekdays[1] == "1" ? true : false);
+      $("#wensday").prop("checked", weekdays[2] == "1" ? true : false);
+      $("#thusday").prop("checked", weekdays[3] == "1" ? true : false);
+      $("#friday").prop("checked", weekdays[4] == "1" ? true : false);
+      $("#sartuday").prop("checked", weekdays[5] == "1" ? true : false);
+      $("#sunday").prop("checked", weekdays[6] == "1" ? true : false);
+    }
+
+    function initData() {
+      $.ajax({
+        type: "GET",
+        url: "/vmBackupScheduler/vmPolicies/" + window.location.href.split("#")[1],
+        headers: {"Accept":"application/json"},
+        success: function(data) {
+          $("#enabled").prop("checked", data["enabled"])
+          $("#backupMethod").val(data["backupMethod"]);
+          $("#cycle").val(data["weekDays"] ? "week" : "day");
+          tmpTimeOfDay = data["timeOfDay"].split(":");
+          $("#hour").val(tmpTimeOfDay[0]);
+          $("#minute").val(tmpTimeOfDay[1]);
+          if (data["weekDays"] != undefined) {
+            setWeekDays(data["weekDays"]);
+          }
+          $('input:radio[name=keepPolicy]').filter("[value=" + data["autoDeleteReservePolicy"] + "]").attr('checked', true);
+          var policyAmount = data["autoDeleteReserveAmount"];
+          if (data["autoDeleteReservePolicy"] == "1") {
+            $("#keepdaynum").val(policyAmount);
+          } else {
+            $("#keepnumnum").val(policyAmount);
+          }
+        }
+      });
+    }
+  </script>
+</div>
+</body>
+</html>
+

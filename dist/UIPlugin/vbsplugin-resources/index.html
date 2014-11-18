@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head></head>
+<body>
+<script src="js/jquery-1.11.1.min.js" language="javascript"></script>
+<script type='text/javascript'>
+    var api = parent.pluginApi('VBSPlugin');
+    var cfg = api.configObject();
+
+    api.register({
+        UiInit: function() {
+            api.addSubTab('VirtualMachine', 'VM Backup', 'vm-backup-vm-tab',
+                'plugin/VBSPlugin/vmTabResult.html');
+
+        },
+        VirtualMachineSelectionChange: function() {
+            if (arguments.length != 1) {
+                api.setTabAccessible('vm-backup-vm-tab', false);
+            }
+            else {
+                api.setTabContentUrl('vm-backup-vm-tab',
+                        'plugin/VBSPlugin/vmTabResult.html#'+arguments[0].id);
+                api.setTabAccessible('vm-backup-vm-tab', true);
+            }
+        }
+    });
+    api.ready();
+</script>
+</body>
+</html>
