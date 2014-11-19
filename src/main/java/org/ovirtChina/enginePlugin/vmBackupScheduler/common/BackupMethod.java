@@ -3,11 +3,15 @@ package org.ovirtChina.enginePlugin.vmBackupScheduler.common;
 import java.util.HashMap;
 
 public enum BackupMethod {
-	Snapshot,
-	Export;
+	Snapshot(0),
+	Export(1);
 
 	private int value;
     private static final HashMap<Integer, BackupMethod> valueToType = new HashMap<Integer, BackupMethod>();
+
+    private BackupMethod(int value) {
+        this.value = value;
+    }
 
     static {
         for (BackupMethod status : values()) {
