@@ -24,7 +24,7 @@ ALTER TABLE ONLY tasks
     ADD CONSTRAINT tasks_pk PRIMARY KEY (id);
 
 ALTER TABLE ONLY vm_policies
-    ADD CONSTRAINT vm_policies_pk PRIMARY KEY (id);
+    ADD CONSTRAINT vm_policies_pk PRIMARY KEY (id, backup_method);
 
 
 CREATE OR REPLACE FUNCTION public.create_plpgsql_language ()
