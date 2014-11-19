@@ -74,24 +74,24 @@
 
     function getWeekDays() {
       var weekdays = "";
+      weekdays += $("#sunday").is(":checked") ? "1" : "0";
       weekdays += $("#monday").is(":checked") ? "1" : "0";
       weekdays += $("#tuesday").is(":checked") ? "1" : "0";
       weekdays += $("#wensday").is(":checked") ? "1" : "0";
       weekdays += $("#thusday").is(":checked") ? "1" : "0";
       weekdays += $("#friday").is(":checked") ? "1" : "0";
       weekdays += $("#sartuday").is(":checked") ? "1" : "0";
-      weekdays += $("#sunday").is(":checked") ? "1" : "0";
       return weekdays;
     }
 
     function setWeekDays(weekdays) {
-      $("#monday").prop("checked", weekdays[0] == "1" ? true : false);
-      $("#tuesday").prop("checked", weekdays[1] == "1" ? true : false);
-      $("#wensday").prop("checked", weekdays[2] == "1" ? true : false);
-      $("#thusday").prop("checked", weekdays[3] == "1" ? true : false);
-      $("#friday").prop("checked", weekdays[4] == "1" ? true : false);
-      $("#sartuday").prop("checked", weekdays[5] == "1" ? true : false);
-      $("#sunday").prop("checked", weekdays[6] == "1" ? true : false);
+      $("#sunday").prop("checked", weekdays[0] == "1" ? true : false);
+      $("#monday").prop("checked", weekdays[1] == "1" ? true : false);
+      $("#tuesday").prop("checked", weekdays[2] == "1" ? true : false);
+      $("#wensday").prop("checked", weekdays[3] == "1" ? true : false);
+      $("#thusday").prop("checked", weekdays[4] == "1" ? true : false);
+      $("#friday").prop("checked", weekdays[5] == "1" ? true : false);
+      $("#sartuday").prop("checked", weekdays[6] == "1" ? true : false);
     }
 
     function initData() {
