@@ -23,6 +23,14 @@ public class TaskDAOImpl extends CrudDAO<Task>{
         return null;
     }
 
+    public Task getExecutingTaskForVm(UUID vmId) {
+        List<Task> result = DbFacade.getInstance().executeReadList("getExecutingTaskForVm", instance, createIdParametersMapper(vmId));
+        if (result != null && result.size() > 0) {
+            return result.get(0);
+        }
+        return null;
+    }
+
     public TaskDAOImpl() {
         instance = new RowMapper<Task>() {
 

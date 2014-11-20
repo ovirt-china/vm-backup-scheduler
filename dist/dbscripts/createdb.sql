@@ -102,6 +102,19 @@ END; $procedure$
 LANGUAGE plpgsql;
 
 
+CREATE OR REPLACE FUNCTION getExecutingTaskForVm(v_id UUID)RETURNS SETOF task STABLE
+  AS $procedure$
+BEGIN
+RETURN QUERY SELECT *
+             FROM tasks task
+             WHERE task.id = v_id
+             AND (task.task_status = 0
+             OR task.task_status = 1)
+             LIMIT 1;
+END; $procedure$
+LANGUAGE plpgsql;
+
+
 CREATE OR REPLACE FUNCTION updateTask(v_id UUID,
   v_task_status INTEGER,
   v_task_type INTEGER,
