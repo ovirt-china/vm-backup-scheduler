@@ -19,28 +19,10 @@ import org.ovirtChina.enginePlugin.vmBackupScheduler.utils.OVirtEngineSDKUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ExecuteExport extends TimerTask {
+public class ExecuteExport extends TimerSDKTask {
     private static Logger log = LoggerFactory.getLogger(TimerTask.class);
 
-    @Override
-    public void run() {
-        Api api = null;
-        try {
-            peformAction(api);
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if (api != null) {
-                try {
-                    api.close();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
-
-    private void peformAction(Api api) throws ClientProtocolException, ServerException, IOException, InterruptedException {
+    protected void peformAction(Api api) throws ClientProtocolException, ServerException, IOException, InterruptedException {
         Task taskToExec = DbFacade.getInstance().getTaskDAO().getOldestTaskTypeWithStatus(TaskType.CreateExport, TaskStatus.EXECUTING);
         if (taskToExec == null) {
             taskToExec = DbFacade.getInstance().getTaskDAO().getOldestTaskTypeWithStatus(TaskType.CreateExport, TaskStatus.WAITING);
@@ -77,12 +59,6 @@ public class ExecuteExport extends TimerTask {
                 }
             }
         }
-    }
-
-    private void setTaskStatus(Task taskToExec, TaskStatus taskStatus) {
-        taskToExec.setTaskStatus(taskStatus.getValue());
-        taskToExec.setLastUpdate(new Date());
-        DbFacade.getInstance().getTaskDAO().update(taskToExec);
     }
 
     private void queryExport(Api api, Task taskToExec, VM vm) throws ClientProtocolException, ServerException, IOException, InterruptedException {

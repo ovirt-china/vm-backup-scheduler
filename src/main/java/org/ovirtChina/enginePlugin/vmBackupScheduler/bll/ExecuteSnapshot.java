@@ -2,7 +2,6 @@ package org.ovirtChina.enginePlugin.vmBackupScheduler.bll;
 
 import java.io.IOException;
 import java.util.Date;
-import java.util.TimerTask;
 import java.util.UUID;
 
 import org.apache.http.client.ClientProtocolException;
@@ -18,28 +17,10 @@ import org.ovirtChina.enginePlugin.vmBackupScheduler.utils.OVirtEngineSDKUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ExecuteSnapshot extends TimerTask {
+public class ExecuteSnapshot extends TimerSDKTask {
     private static Logger log = LoggerFactory.getLogger(ExecuteSnapshot.class);
 
-    @Override
-    public void run() {
-        Api api = null;
-        try {
-            peformAction(api);
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if (api != null) {
-                try {
-                    api.close();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
-
-    private void peformAction(Api api) throws ClientProtocolException, ServerException, IOException {
+    protected void peformAction(Api api) throws ClientProtocolException, ServerException, IOException {
         Task taskToExec = DbFacade.getInstance().getTaskDAO().getOldestTaskTypeWithStatus(TaskType.CreateSnapshot, TaskStatus.EXECUTING);
         if (taskToExec == null) {
             taskToExec = DbFacade.getInstance().getTaskDAO().getOldestTaskTypeWithStatus(TaskType.CreateSnapshot, TaskStatus.WAITING);
@@ -74,11 +55,5 @@ public class ExecuteSnapshot extends TimerTask {
             log.info("vm: " + vm.getName() + " is snapshoting, waiting for next query...");
             Thread.sleep(5000);
         }
-    }
-
-    private void setTaskStatus(Task taskToExec, TaskStatus taskStatus) {
-        taskToExec.setTaskStatus(taskStatus.getValue());
-        taskToExec.setLastUpdate(new Date());
-        DbFacade.getInstance().getTaskDAO().update(taskToExec);
     }
 }
