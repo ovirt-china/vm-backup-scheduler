@@ -8,6 +8,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 import org.ovirtChina.enginePlugin.vmBackupScheduler.common.VmPolicy;
@@ -23,8 +24,11 @@ public class VmPolicyResource {
 
     @GET
     @Path("{id}")
-    public VmPolicy getVmPolicyById(@PathParam("id") String id) {
-        return DbFacade.getInstance().getVmPolicyDAO().get(UUID.fromString(id));
+    public VmPolicy getVmPolicyById(@PathParam("id") String id, @QueryParam("backupMethod") String backupMethod) {
+        if (backupMethod.isEmpty()) {
+            return null;
+        }
+        return DbFacade.getInstance().getVmPolicyDAO().get(UUID.fromString(id), Integer.parseInt(backupMethod));
     }
 
     @PUT

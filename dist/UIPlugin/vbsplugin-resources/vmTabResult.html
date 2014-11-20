@@ -3,7 +3,7 @@
 <head>
   <link rel="stylesheet" href="patternfly/css/patternfly.min.css">
 </head>
-<body onload="initData()">
+<body onload="initData(0)">
 <script src="js/jquery-1.11.1.min.js" language="javascript"></script>
 <script src="patternfly/components/bootstrap-select/bootstrap-select.min.js"></script>
 <script>
@@ -94,14 +94,17 @@
       $("#sartuday").prop("checked", weekdays[6] == "1" ? true : false);
     }
 
-    function initData() {
+    $('#backupMethod').change(function(){
+        initData($("#backupMethod").val());
+    });
+
+    function initData(backupMethod) {
       $.ajax({
         type: "GET",
-        url: "/vmBackupScheduler/vmPolicies/" + window.location.href.split("#")[1],
+        url: "/vmBackupScheduler/vmPolicies/" + window.location.href.split("#")[1] + "?backupMethod=" + backupMethod,
         headers: {"Accept":"application/json"},
         success: function(data) {
           $("#enabled").prop("checked", data["enabled"])
-          $("#backupMethod").val(data["backupMethod"]);
           $("#cycle").val(data["weekDays"] ? "week" : "day");
           tmpTimeOfDay = data["timeOfDay"].split(":");
           $("#hour").val(tmpTimeOfDay[0]);

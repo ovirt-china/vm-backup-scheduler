@@ -15,6 +15,17 @@ public class VmPolicyDAOImpl extends CrudDAO<VmPolicy>{
         return DbFacade.getInstance().executeReadList("getScheduleVms", instance, null);
     }
 
+    public VmPolicy get(UUID id, int backupMethod) {
+        List<VmPolicy> result =
+                (List<VmPolicy>)DbFacade.getInstance().executeReadList(
+                        "getVmPolicyByIdBackupMethod", instance,
+                        createIdParametersMapper(id).addValue("v_backup_method", backupMethod));
+        if (result != null && result.size() > 0) {
+            return result.get(0);
+        }
+        return null;
+    }
+
     public VmPolicyDAOImpl() {
         instance = new RowMapper<VmPolicy>() {
 

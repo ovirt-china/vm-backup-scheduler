@@ -172,6 +172,20 @@ END; $procedure$
 LANGUAGE plpgsql;
 
 
+CREATE OR REPLACE FUNCTION getVmPolicyByIdBackupMethod(
+  v_id UUID,
+  v_backup_method INTEGER)
+  RETURNS SETOF vm_policy STABLE
+  AS $procedure$
+BEGIN
+RETURN QUERY SELECT *
+             FROM vm_policies vm_policy
+             WHERE vm_policy.id = v_id
+             AND vm_policy.backup_method = v_backup_method;
+END; $procedure$
+LANGUAGE plpgsql;
+
+
 CREATE OR REPLACE FUNCTION updateVmPolicy(v_id UUID,
   v_enabled BOOLEAN,
   v_backup_method INTEGER,
