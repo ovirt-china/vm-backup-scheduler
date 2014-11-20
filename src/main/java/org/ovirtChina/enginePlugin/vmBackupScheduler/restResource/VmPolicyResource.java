@@ -44,8 +44,8 @@ public class VmPolicyResource {
     }
 
     private Response addOrUpdateVmPolicy(VmPolicy vmPolicy) {
-        VmPolicy tmpVmPolicy = DbFacade.getInstance().getVmPolicyDAO().get(vmPolicy.getVmID());
-        if (tmpVmPolicy != null && tmpVmPolicy.getBackupMethod() == vmPolicy.getBackupMethod()) {
+        VmPolicy tmpVmPolicy = DbFacade.getInstance().getVmPolicyDAO().get(vmPolicy.getVmID(), vmPolicy.getBackupMethod());
+        if (tmpVmPolicy != null) {
             DbFacade.getInstance().getVmPolicyDAO().update(vmPolicy);
         } else {
             DbFacade.getInstance().getVmPolicyDAO().save(vmPolicy);

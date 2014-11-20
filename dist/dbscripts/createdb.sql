@@ -198,12 +198,12 @@ RETURNS VOID
 BEGIN
   UPDATE vm_policies
   SET enabled = v_enabled,
-      backup_method = v_backup_method,
       time_of_day = v_time_of_day,
       week_days = v_week_days,
       auto_delete_reserve_policy = v_auto_delete_reserve_policy,
       auto_delete_reserve_amount = v_auto_delete_reserve_amount
-  WHERE id = v_id;
+  WHERE id = v_id
+  AND backup_method = v_backup_method;
 END; $procedure$
 LANGUAGE plpgsql;
 
