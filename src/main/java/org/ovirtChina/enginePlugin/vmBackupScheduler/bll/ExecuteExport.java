@@ -1,7 +1,6 @@
 package org.ovirtChina.enginePlugin.vmBackupScheduler.bll;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.TimerTask;
 
 import org.apache.http.client.ClientProtocolException;
