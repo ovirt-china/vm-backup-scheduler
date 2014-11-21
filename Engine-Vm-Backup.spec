@@ -14,6 +14,7 @@ BuildRoot:	%(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 
 BuildRequires:	/bin/bash
 Requires:	ovirt-engine >= 3.5.0
+Requires:	patternfly1
 
 %description
 
@@ -36,6 +37,9 @@ cp target/vmBackupScheduler.war %{buildroot}/usr/share/ovirt-engine-jboss-as/sta
 
 %clean
 rm -rf %{buildroot}
+
+%post
+ln -s /usr/share/patternfly1/resources/ /usr/share/ovirt-engine/ui-plugins/vbsplugin-resources/patternfly
 
 
 %files
