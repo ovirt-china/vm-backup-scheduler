@@ -7,4 +7,4 @@ sudo -su postgres psql -d ovirtbackup -a -f /usr/share/vm-backup/createdb.sql
 echo "Updating db password to vm-backup.xml..."
 . /etc/ovirt-engine/engine.conf.d/10-setup-database.conf
 sed -i "s/<password>.*<\/password>/<password>$ENGINE_DB_PASSWORD<\/password>/"\
- /usr/share/ovirt-engine-jboss-as/standalone/configuration/vm-backup.xml
+ /usr/share/ovirt-engine-jboss-as/standalone/configuration/engine-vm-backup.xml
