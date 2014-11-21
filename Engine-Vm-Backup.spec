@@ -58,6 +58,9 @@ ln -s /usr/share/patternfly1/resources/ /usr/share/ovirt-engine/ui-plugins/vbspl
 /usr/share/ovirt-engine-jboss-as/standalone/deployments/
 /usr/share/ovirt-engine-jboss-as/standalone/configuration/
 
+%postun
+unlink /usr/share/ovirt-engine/ui-plugins/vbsplugin-resources/patternfly
+
 
 %changelog
 
