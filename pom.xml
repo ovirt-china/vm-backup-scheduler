@@ -53,7 +53,7 @@
     <dependency>
       <groupId>org.ovirt.engine.sdk</groupId>
       <artifactId>ovirt-engine-sdk-java</artifactId>
-      <version>3.4.4.0</version>
+      <version>3.5.0.5</version>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
