@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 public class ExecuteExport extends TimerSDKTask {
     private static Logger log = LoggerFactory.getLogger(TimerTask.class);
 
-    protected void peformAction(Api api) throws ClientProtocolException, ServerException, IOException, InterruptedException {
+    protected void peformAction() throws ClientProtocolException, ServerException, IOException, InterruptedException {
         Task taskToExec = DbFacade.getInstance().getTaskDAO().getOldestTaskTypeWithStatus(TaskType.CreateExport, TaskStatus.EXECUTING);
         if (taskToExec == null) {
             taskToExec = DbFacade.getInstance().getTaskDAO().getOldestTaskTypeWithStatus(TaskType.CreateExport, TaskStatus.WAITING);

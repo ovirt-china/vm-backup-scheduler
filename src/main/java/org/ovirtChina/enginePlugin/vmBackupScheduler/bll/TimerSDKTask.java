@@ -10,11 +10,12 @@ import org.ovirtChina.enginePlugin.vmBackupScheduler.dao.DbFacade;
 
 public abstract class TimerSDKTask extends TimerTask {
 
+    protected Api api = null;
+
     @Override
     public void run() {
-        Api api = null;
         try {
-            peformAction(api);
+            peformAction();
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -34,6 +35,6 @@ public abstract class TimerSDKTask extends TimerTask {
         DbFacade.getInstance().getTaskDAO().update(taskToExec);
     }
 
-    protected abstract void peformAction(Api api) throws Exception;
+    protected abstract void peformAction() throws Exception;
 
 }

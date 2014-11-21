@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.UUID;
 
 import org.apache.http.client.ClientProtocolException;
-import org.ovirt.engine.sdk.Api;
 import org.ovirt.engine.sdk.decorators.VM;
 import org.ovirt.engine.sdk.entities.Snapshot;
 import org.ovirt.engine.sdk.exceptions.ServerException;
@@ -19,7 +18,7 @@ import org.slf4j.LoggerFactory;
 public class ExecuteSnapshot extends TimerSDKTask {
     private static Logger log = LoggerFactory.getLogger(ExecuteSnapshot.class);
 
-    protected void peformAction(Api api) throws ClientProtocolException, ServerException, IOException {
+    protected void peformAction() throws ClientProtocolException, ServerException, IOException {
         Task taskToExec = DbFacade.getInstance().getTaskDAO().getOldestTaskTypeWithStatus(TaskType.CreateSnapshot, TaskStatus.EXECUTING);
         if (taskToExec == null) {
             taskToExec = DbFacade.getInstance().getTaskDAO().getOldestTaskTypeWithStatus(TaskType.CreateSnapshot, TaskStatus.WAITING);
@@ -39,7 +38,7 @@ public class ExecuteSnapshot extends TimerSDKTask {
                 taskToExec.setBackupName(snapshotId);
                 setTaskStatus(taskToExec, TaskStatus.EXECUTING);
                 try {
-                    querySnapshot(api, taskToExec, vm);
+                    querySnapshot(taskToExec, vm);
                 } catch (InterruptedException e) {
                     log.error("Error while snapshoting vm: " + vm.getName(), e);
                     setTaskStatus(taskToExec, TaskStatus.FAILED);
@@ -49,7 +48,7 @@ public class ExecuteSnapshot extends TimerSDKTask {
         }
     }
 
-    private void querySnapshot(Api api, Task taskToExec, VM vm) throws ClientProtocolException, ServerException, IOException, InterruptedException {
+    private void querySnapshot(Task taskToExec, VM vm) throws ClientProtocolException, ServerException, IOException, InterruptedException {
         while(!api.getVMs().get(UUID.fromString(vm.getId())).getSnapshots().getById(taskToExec.getBackupName()).getSnapshotStatus().equals("ok")) {
             log.info("vm: " + vm.getName() + " is snapshoting, waiting for next query...");
             Thread.sleep(5000);
