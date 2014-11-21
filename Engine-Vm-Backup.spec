@@ -31,6 +31,7 @@ rm -rf %{buildroot}
 mkdir -p %{buildroot}/usr/share/ovirt-engine/ui-plugins/
 mkdir -p %{buildroot}/etc/httpd/conf.d/
 mkdir -p %{buildroot}/usr/share/ovirt-engine-jboss-as/standalone/deployments/
+mkdir -p %{buildroot}/usr/share/ovirt-engine-jboss-as/standalone/configuration/
 cp -r dist/UIPlugin/* %{buildroot}/usr/share/ovirt-engine/ui-plugins/
 cp dist/httpd/z-vm-backup-scheduler-proxy.conf %{buildroot}/etc/httpd/conf.d/
 cp dist/jboss-config/vm-backup.xml %{buildroot}/usr/share/ovirt-engine-jboss-as/standalone/configuration
@@ -49,6 +50,7 @@ ln -s /usr/share/patternfly1/resources/ /usr/share/ovirt-engine/ui-plugins/vbspl
 %config /etc/httpd/conf.d/z-vm-backup-scheduler-proxy.conf
 /usr/share/ovirt-engine/ui-plugins/
 /usr/share/ovirt-engine-jboss-as/standalone/deployments/
+/usr/share/ovirt-engine-jboss-as/standalone/configuration/
 
 
 %changelog
