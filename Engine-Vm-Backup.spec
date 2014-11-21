@@ -36,8 +36,8 @@ cp -r dist/UIPlugin/* %{buildroot}/usr/share/ovirt-engine/ui-plugins/
 cp dist/httpd/z-vm-backup-scheduler-proxy.conf %{buildroot}/etc/httpd/conf.d/
 cp dist/jboss-config/vm-backup.xml %{buildroot}/usr/share/ovirt-engine-jboss-as/standalone/configuration
 cp target/vmBackupScheduler.war %{buildroot}/usr/share/ovirt-engine-jboss-as/standalone/deployments/
-cp dist/bin/vm-backup-setup /usr/sbin/
-cp dist/service/engine-vm-backup /etc/rc.d/init.d/
+cp dist/bin/vm-backup-setup %{buildroot}/usr/sbin/
+cp dist/service/engine-vm-backup %{buildroot}/etc/rc.d/init.d/
 
 %clean
 rm -rf %{buildroot}
