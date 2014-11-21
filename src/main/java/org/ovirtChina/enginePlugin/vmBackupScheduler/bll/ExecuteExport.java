@@ -1,6 +1,9 @@
 package org.ovirtChina.enginePlugin.vmBackupScheduler.bll;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.TimerTask;
 
 import org.apache.http.client.ClientProtocolException;
@@ -20,6 +23,7 @@ import org.slf4j.LoggerFactory;
 
 public class ExecuteExport extends TimerSDKTask {
     private static Logger log = LoggerFactory.getLogger(TimerTask.class);
+    DateFormat df = new SimpleDateFormat("MM-dd-yyyy_HH-mm-ss");
 
     protected void peformAction() throws ClientProtocolException, ServerException, IOException, InterruptedException {
         Task taskToExec = DbFacade.getInstance().getTaskDAO().getOldestTaskTypeWithStatus(TaskType.CreateExport, TaskStatus.EXECUTING);
@@ -37,16 +41,28 @@ public class ExecuteExport extends TimerSDKTask {
                 if (taskToExec.getTaskStatus() == TaskStatus.WAITING.getValue()) {
                     VM vm = api.getVMs().get(taskToExec.getVmID());
                     if (vm.getStatus().getState().equals("down")) {
-                        Action action = new Action();
-                        action.setStorageDomain(isoDoaminToExport);
-                        log.info("Start executing task" + BackupMethod.forValue(taskToExec.getTaskType()) + " for vm: " + vm.getName());
-                        vm.exportVm(action);
+                        VM vmCopy = copyVm(vm);
                         setTaskStatus(taskToExec, TaskStatus.EXECUTING);
                         try{
-                            queryExport(api, taskToExec, vm);
+                            queryCopying(vmCopy);
                         } catch (Exception e) {
-                            log.error("Error while exporting vm: " + vm.getName(), e);
+                            log.error("Error while copying vm: " + vmCopy.getName(), e);
                             setTaskStatus(taskToExec, TaskStatus.FAILED);
+                            deleteVmCopy(vmCopy);
+                            return;
+                        }
+                        Action action = new Action();
+                        action.setStorageDomain(isoDoaminToExport);
+                        log.info("Start executing task" + BackupMethod.forValue(taskToExec.getTaskType()) + " for vm: " + vmCopy.getName());
+                        vmCopy.exportVm(action);
+                        try{
+                            queryExport(api, taskToExec, vmCopy);
+                        } catch (Exception e) {
+                            log.error("Error while exporting vm: " + vmCopy.getName(), e);
+                            setTaskStatus(taskToExec, TaskStatus.FAILED);
+                            return;
+                        } finally {
+                            deleteVmCopy(vmCopy);
                         }
                         setTaskStatus(taskToExec, TaskStatus.FINISHED);
                         log.info("Execution of task" + BackupMethod.forValue(taskToExec.getTaskType()) + " for vm: " + vm.getName() + " succeeded.");
@@ -58,6 +74,29 @@ public class ExecuteExport extends TimerSDKTask {
                 }
             }
         }
+    }
+
+    private void queryCopying(VM vmCopy) throws ClientProtocolException, ServerException, IOException, InterruptedException {
+        while(!api.getVMs().get(vmCopy.getName()).getStatus().getState().equals("down")) {
+            log.info("vm: " + vmCopy.getName() + " is being cloned, waiting for next query...");
+            Thread.sleep(5000);
+        }
+    }
+
+    private void deleteVmCopy(VM vmCopy) throws ClientProtocolException, ServerException, IOException {
+        api.getVMs().get(vmCopy.getName()).delete();
+        log.info("vm: " + vmCopy.getName() + " has deleted.");
+    }
+
+    private VM copyVm(VM vm) throws ClientProtocolException, ServerException, IOException, InterruptedException {
+        VM copyVm = new VM(null);
+        String copyVmName = vm.getName() + "Backup_" + df.format(new Date());
+        copyVm.setName(copyVmName);
+        Action action = new Action();
+        action.setVm(copyVm);
+        api.getVMs().get("hehe").clone(action);
+
+        return copyVm;
     }
 
     private void queryExport(Api api, Task taskToExec, VM vm) throws ClientProtocolException, ServerException, IOException, InterruptedException {
