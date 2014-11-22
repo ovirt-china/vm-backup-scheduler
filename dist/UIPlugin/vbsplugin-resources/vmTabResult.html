@@ -118,7 +118,7 @@
         success: function(data) {
           try {
             $("#enabled").prop("checked", data["enabled"])
-            var isWeek = !data["weekDays"] || data["weekDays"] != "";
+            var isWeek = data["weekDays"] && data["weekDays"] != "";
             $("#cycle").val(isWeek ? "week" : "day");
             weekDaysDisplay(isWeek);
             tmpTimeOfDay = data["timeOfDay"].split(":");
