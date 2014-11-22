@@ -1,7 +1,7 @@
 %define _version 1.0
 %define _release 1
 
-Name:		Engine-Vm-Backup
+Name:		engine-vm-backup
 Version:	%{_version}
 Release:	%{_release}%{?dist}
 Summary:	Engine auto vm backup service
@@ -9,7 +9,7 @@ Summary:	Engine auto vm backup service
 Group:		ovirt-engine-third-party
 License:	GPL
 URL:		http://www.eayun.com
-Source0:	Engine-Vm-Backup-%{_version}.tar.gz
+Source0:	engine-vm-backup-%{_version}.tar.gz
 BuildRoot:	%(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 
 BuildRequires:	/bin/bash
