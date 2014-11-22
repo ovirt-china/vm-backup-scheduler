@@ -14,7 +14,6 @@ import org.ovirt.engine.sdk.decorators.VM;
 import org.ovirt.engine.sdk.decorators.VMDisk;
 import org.ovirt.engine.sdk.entities.Action;
 import org.ovirt.engine.sdk.exceptions.ServerException;
-import org.ovirtChina.enginePlugin.vmBackupScheduler.common.BackupMethod;
 import org.ovirtChina.enginePlugin.vmBackupScheduler.common.Task;
 import org.ovirtChina.enginePlugin.vmBackupScheduler.common.TaskStatus;
 import org.ovirtChina.enginePlugin.vmBackupScheduler.common.TaskType;
@@ -46,7 +45,7 @@ public class ExecuteExport extends TimerSDKTask {
                         VM vmCopy = copyVm(vm);
                         setTaskStatus(taskToExec, TaskStatus.EXECUTING);
                         try{
-                            queryCopying(vmCopy);
+                            queryVmForDown(vmCopy, "Copying");
                         } catch (Exception e) {
                             log.error("Error while copying vm: " + vmCopy.getName(), e);
                             setTaskStatus(taskToExec, TaskStatus.FAILED);
@@ -55,10 +54,10 @@ public class ExecuteExport extends TimerSDKTask {
                         }
                         Action action = new Action();
                         action.setStorageDomain(isoDoaminToExport);
-                        log.info("Start executing task " + BackupMethod.forValue(taskToExec.getTaskType()) + " for vm: " + vmCopy.getName());
+                        log.info("Start executing task Export for vm: " + vmCopy.getName());
                         api.getVMs().get(vmCopy.getName()).exportVm(action);
                         try{
-                            queryExport(api, taskToExec, vmCopy);
+                            queryVmForDown(vmCopy, "Exporting");
                         } catch (Exception e) {
                             log.error("Error while exporting vm: " + vmCopy.getName(), e);
                             setTaskStatus(taskToExec, TaskStatus.FAILED);
@@ -67,7 +66,7 @@ public class ExecuteExport extends TimerSDKTask {
                             deleteVmCopy(vmCopy);
                         }
                         setTaskStatus(taskToExec, TaskStatus.FINISHED);
-                        log.info("Execution of task" + BackupMethod.forValue(taskToExec.getTaskType()) + " for vm: " + vm.getName() + " succeeded.");
+                        log.info("Execution of task Export for vm: " + vm.getName() + " succeeded.");
                     } else {
                         setTaskStatus(taskToExec, TaskStatus.FAILED);
                         log.warn("Exporting vm failed, vm: " + vm.getId() + " is not down.");
@@ -78,9 +77,9 @@ public class ExecuteExport extends TimerSDKTask {
         }
     }
 
-    private void queryCopying(VM vmCopy) throws ClientProtocolException, ServerException, IOException, InterruptedException {
+    private void queryVmForDown(VM vmCopy, String action) throws ClientProtocolException, ServerException, IOException, InterruptedException {
         while(!api.getVMs().get(vmCopy.getName()).getStatus().getState().equals("down")) {
-            log.info("vm: " + vmCopy.getName() + " is being cloned, waiting for next query...");
+            log.info("vm: " + vmCopy.getName() + " is " + action + ", waiting for next query...");
             Thread.sleep(1000);
         }
         boolean copyingDisks = true;
@@ -91,7 +90,7 @@ public class ExecuteExport extends TimerSDKTask {
                 if(!disk.getStatus().getState().equals("ok")) {
                     copyingDisks = true;
                     log.info("vm: " + vmCopy.getName() + "'s disk " + disk.getName() + " is being cloned, waiting for next query...");
-                    Thread.sleep(1000);
+                    Thread.sleep(5000);
                     break;
                 }
             }
@@ -112,13 +111,6 @@ public class ExecuteExport extends TimerSDKTask {
         api.getVMs().getById(vm.getId()).clone(action);
 
         return copyVm;
-    }
-
-    private void queryExport(Api api, Task taskToExec, VM vm) throws ClientProtocolException, ServerException, IOException, InterruptedException {
-        while (!api.getVMs().get(taskToExec.getVmID()).getStatus().getState().equals("down")) {
-            log.info("vm: " + vm.getName() + " is exporting, waiting for next query...");
-            Thread.sleep(5000);
-        }
     }
 
     private StorageDomain getIsoDomainToExport(Api api) throws ClientProtocolException, ServerException, IOException {
