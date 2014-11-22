@@ -51,6 +51,7 @@ public class FindJobs extends TimerTask {
         Date policyTime = new Date();
         policyTime.setHours(Integer.parseInt(policyTimeString[0]));
         policyTime.setMinutes(Integer.parseInt(policyTimeString[1]));
+        policyTime.setSeconds(0);
         log.info("time diff: " + (now.getTime() - policyTime.getTime()));
         if (Math.abs(now.getTime() - policyTime.getTime()) < 60000L) {
             Task task = DbFacade.getInstance().getTaskDAO().getOldestTaskTypeWithStatus(
