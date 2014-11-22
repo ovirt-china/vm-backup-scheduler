@@ -20,9 +20,6 @@ CREATE TABLE vm_policies (
   auto_delete_reserve_amount integer NOT NULL
 );
 
-ALTER TABLE ONLY tasks
-    ADD CONSTRAINT tasks_pk PRIMARY KEY (id);
-
 ALTER TABLE ONLY vm_policies
     ADD CONSTRAINT vm_policies_pk PRIMARY KEY (id, backup_method);
 
@@ -81,7 +78,9 @@ CREATE OR REPLACE FUNCTION getTaskById(v_id UUID) RETURNS SETOF task STABLE
 BEGIN
 RETURN QUERY SELECT *
              FROM tasks task
-             WHERE task.id = v_id;
+             WHERE task.id = v_id
+             ORDER BY create_time DESC
+             LIMIT 1;
 END; $procedure$
 LANGUAGE plpgsql;
 
@@ -130,7 +129,13 @@ BEGIN
       backup_name = v_backup_name,
       create_time = v_create_time,
       last_update = v_last_update
-  WHERE id = v_id;
+  WHERE create_time =(
+    SELECT create_time
+    FROM tasks
+    WHERE id = v_id
+    ORDER BY create_time DESC
+    LIMIT 1
+  );
 END; $procedure$
 LANGUAGE plpgsql;
 
