@@ -36,8 +36,8 @@ mkdir -p %{buildroot}/usr/share/ovirt-engine-jboss-as/standalone/configuration/
 mkdir -p %{buildroot}/usr/sbin/
 mkdir -p %{buildroot}/etc/rc.d/init.d/
 cp -r dist/UIPlugin/* %{buildroot}/usr/share/ovirt-engine/ui-plugins/
-cp dist/httpd/z-vm-backup-scheduler-proxy.conf %{buildroot}/etc/httpd/conf.d/
-cp dist/jboss-config/engine-vm-backup.xml %{buildroot}/usr/share/ovirt-engine-jboss-as/standalone/configuration
+cp dist/config/z-vm-backup-scheduler-proxy.conf %{buildroot}/etc/httpd/conf.d/
+cp dist/config/engine-vm-backup.xml %{buildroot}/usr/share/ovirt-engine-jboss-as/standalone/configuration
 cp target/vmBackupScheduler.war %{buildroot}/usr/share/ovirt-engine-jboss-as/standalone/deployments/
 cp dist/bin/vm-backup-setup %{buildroot}/usr/sbin/
 cp dist/bin/vm-backup-cleanup %{buildroot}/usr/sbin/
