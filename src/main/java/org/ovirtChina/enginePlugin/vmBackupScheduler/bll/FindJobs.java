@@ -25,7 +25,7 @@ public class FindJobs extends TimerTask {
         cal.setTime(now);
         int dayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
         for (VmPolicy policy : policies) {
-            if (!policy.getWeekDays().isEmpty() && policy.getWeekDays().charAt(dayOfWeek) != '0'
+            if (!policy.getWeekDays().isEmpty() && policy.getWeekDays().charAt(dayOfWeek-1) != '0'
                     || policy.getWeekDays().isEmpty()) {
                 if (policy.isEnabled()
                         && isTimeToSchedule(now, policy)
