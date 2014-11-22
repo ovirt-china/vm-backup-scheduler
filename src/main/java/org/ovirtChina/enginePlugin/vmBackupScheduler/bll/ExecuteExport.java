@@ -53,8 +53,8 @@ public class ExecuteExport extends TimerSDKTask {
                         }
                         Action action = new Action();
                         action.setStorageDomain(isoDoaminToExport);
-                        log.info("Start executing task" + BackupMethod.forValue(taskToExec.getTaskType()) + " for vm: " + vmCopy.getName());
-                        vmCopy.exportVm(action);
+                        log.info("Start executing task " + BackupMethod.forValue(taskToExec.getTaskType()) + " for vm: " + vmCopy.getName());
+                        api.getVMs().get(vmCopy.getName()).exportVm(action);
                         try{
                             queryExport(api, taskToExec, vmCopy);
                         } catch (Exception e) {
@@ -90,11 +90,11 @@ public class ExecuteExport extends TimerSDKTask {
 
     private VM copyVm(VM vm) throws ClientProtocolException, ServerException, IOException, InterruptedException {
         VM copyVm = new VM(null);
-        String copyVmName = vm.getName() + "Backup_" + df.format(new Date());
+        String copyVmName = vm.getName() + "_Backup_" + df.format(new Date());
         copyVm.setName(copyVmName);
         Action action = new Action();
         action.setVm(copyVm);
-        api.getVMs().get("hehe").clone(action);
+        api.getVMs().getById(vm.getId()).clone(action);
 
         return copyVm;
     }
