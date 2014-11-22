@@ -10,15 +10,15 @@ public class ConfigProvider {
     static private Logger log = org.slf4j.LoggerFactory.getLogger(ConfigProvider.class);
     private static Properties config = null;
 
-    public static final String SDK_BASE_URL = "org.ovirtChina.enginePlugin.vmBackupScheduler.engineSdkBaseUrl";
-    public static final String SDK_USER = "org.ovirtChina.enginePlugin.vmBackupScheduler.engineSdkUser";
-    public static final String SDK_PASSWORD = "org.ovirtChina.enginePlugin.vmBackupScheduler.engineSdkPassword";
+    public static final String SDK_BASE_URL = "engineSdkBaseUrl";
+    public static final String SDK_USER = "engineSdkUser";
+    public static final String SDK_PASSWORD = "engineSdkPassword";
 
     public static Properties getConfig() {
         if (config == null) {
             config = new Properties();
             try {
-                config.load(new FileReader("/etc/ovirt-vm-backup/ovirt-vm-backup.properties"));
+                config.load(new FileReader("/etc/engine-vm-backup/engine-vm-backup.properties"));
             } catch (IOException ex) {
                 log.error("error reading config file.", ex);
             }

@@ -31,6 +31,7 @@ rm -rf %{buildroot}
 mkdir -p %{buildroot}/usr/share/ovirt-engine/ui-plugins/
 mkdir -p %{buildroot}/usr/share/engine-vm-backup/
 mkdir -p %{buildroot}/etc/httpd/conf.d/
+mkdir -p %{buildroot}/etc/engine-vm-backup/
 mkdir -p %{buildroot}/usr/share/ovirt-engine-jboss-as/standalone/deployments/
 mkdir -p %{buildroot}/usr/share/ovirt-engine-jboss-as/standalone/configuration/
 mkdir -p %{buildroot}/usr/sbin/
@@ -43,6 +44,7 @@ cp dist/bin/vm-backup-setup %{buildroot}/usr/sbin/
 cp dist/bin/vm-backup-cleanup %{buildroot}/usr/sbin/
 cp dist/service/engine-vm-backup %{buildroot}/etc/rc.d/init.d/
 cp dist/dbscripts/createdb.sql %{buildroot}/usr/share/engine-vm-backup/
+cp dist/config/engine-vm-backup.properties %{buildroot}/etc/engine-vm-backup/
 
 %clean
 rm -rf %{buildroot}
@@ -54,6 +56,7 @@ ln -s /usr/share/patternfly1/resources/ /usr/share/ovirt-engine/ui-plugins/vbspl
 %files
 %defattr(-,root,root,-)
 %dir /etc/httpd/conf.d/
+%dir /etc/engine-vm-backup/
 %config /etc/httpd/conf.d/z-vm-backup-scheduler-proxy.conf
 %attr(0755,root,root) /usr/sbin/vm-backup-setup
 %attr(0755,root,root) /usr/sbin/vm-backup-cleanup
