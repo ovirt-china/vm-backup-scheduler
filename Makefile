@@ -1,4 +1,4 @@
-project_name = Engine-Vm-Backup
+project_name = engine-vm-backup
 version = $(shell grep "%define _version" $(project_name).spec  | awk '{print $$3}')
 
 sources:
