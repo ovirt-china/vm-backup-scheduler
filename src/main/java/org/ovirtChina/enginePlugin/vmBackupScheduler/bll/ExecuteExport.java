@@ -4,12 +4,14 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.TimerTask;
 
 import org.apache.http.client.ClientProtocolException;
 import org.ovirt.engine.sdk.Api;
 import org.ovirt.engine.sdk.decorators.StorageDomain;
 import org.ovirt.engine.sdk.decorators.VM;
+import org.ovirt.engine.sdk.decorators.VMDisk;
 import org.ovirt.engine.sdk.entities.Action;
 import org.ovirt.engine.sdk.exceptions.ServerException;
 import org.ovirtChina.enginePlugin.vmBackupScheduler.common.BackupMethod;
@@ -79,7 +81,20 @@ public class ExecuteExport extends TimerSDKTask {
     private void queryCopying(VM vmCopy) throws ClientProtocolException, ServerException, IOException, InterruptedException {
         while(!api.getVMs().get(vmCopy.getName()).getStatus().getState().equals("down")) {
             log.info("vm: " + vmCopy.getName() + " is being cloned, waiting for next query...");
-            Thread.sleep(5000);
+            Thread.sleep(1000);
+        }
+        boolean copyingDisks = true;
+        while(copyingDisks) {
+            copyingDisks = false;
+            List<VMDisk> disks = api.getVMs().get(vmCopy.getName()).getDisks().list();
+            for(VMDisk disk : disks) {
+                if(!disk.getStatus().getState().equals("ok")) {
+                    copyingDisks = true;
+                    log.info("vm: " + vmCopy.getName() + "'s disk " + disk.getName() + " is being cloned, waiting for next query...");
+                    Thread.sleep(1000);
+                    break;
+                }
+            }
         }
     }
 
