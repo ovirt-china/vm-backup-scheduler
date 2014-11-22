@@ -57,11 +57,11 @@ public class FindJobs extends TimerTask {
                     policy.getBackupMethod() == BackupMethod.Export.getValue() ?
                             TaskType.CreateExport : TaskType.CreateSnapshot,
                             TaskStatus.FINISHED);
-            if (task != null && Math.abs(task.getCreateTime().getTime() - now.getTime()) < 60000L) {
-                return false;
+            if (task == null || task != null && Math.abs(task.getCreateTime().getTime() - now.getTime()) > 60000L) {
+                return true;
             }
         }
-        return true;
+        return false;
     }
 
 }
