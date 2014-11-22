@@ -1,0 +1,2 @@
+echo "Dropping database..."
+sudo -su postgres dropdb ovirtbackup

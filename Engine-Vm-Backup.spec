@@ -39,6 +39,7 @@ cp dist/httpd/z-vm-backup-scheduler-proxy.conf %{buildroot}/etc/httpd/conf.d/
 cp dist/jboss-config/engine-vm-backup.xml %{buildroot}/usr/share/ovirt-engine-jboss-as/standalone/configuration
 cp target/vmBackupScheduler.war %{buildroot}/usr/share/ovirt-engine-jboss-as/standalone/deployments/
 cp dist/bin/vm-backup-setup %{buildroot}/usr/sbin/
+cp dist/bin/vm-backup-cleanup %{buildroot}/usr/sbin/
 cp dist/service/engine-vm-backup %{buildroot}/etc/rc.d/init.d/
 
 %clean
@@ -53,6 +54,7 @@ ln -s /usr/share/patternfly1/resources/ /usr/share/ovirt-engine/ui-plugins/vbspl
 %dir /etc/httpd/conf.d/
 %config /etc/httpd/conf.d/z-vm-backup-scheduler-proxy.conf
 %attr(0755,root,root) /usr/sbin/vm-backup-setup
+%attr(0755,root,root) /usr/sbin/vm-backup-cleanup
 %attr(0755,root,root) /etc/rc.d/init.d/engine-vm-backup
 /usr/share/ovirt-engine/ui-plugins/
 /usr/share/ovirt-engine-jboss-as/standalone/deployments/
