@@ -29,6 +29,7 @@ mvn clean package war:war
 %install
 rm -rf %{buildroot}
 mkdir -p %{buildroot}/usr/share/ovirt-engine/ui-plugins/
+mkdir -p %{buildroot}/usr/share/engine-vm-backup/
 mkdir -p %{buildroot}/etc/httpd/conf.d/
 mkdir -p %{buildroot}/usr/share/ovirt-engine-jboss-as/standalone/deployments/
 mkdir -p %{buildroot}/usr/share/ovirt-engine-jboss-as/standalone/configuration/
@@ -41,6 +42,7 @@ cp target/vmBackupScheduler.war %{buildroot}/usr/share/ovirt-engine-jboss-as/sta
 cp dist/bin/vm-backup-setup %{buildroot}/usr/sbin/
 cp dist/bin/vm-backup-cleanup %{buildroot}/usr/sbin/
 cp dist/service/engine-vm-backup %{buildroot}/etc/rc.d/init.d/
+cp dist/dbscripts/createdb.sql %{buildroot}/usr/share/engine-vm-backup/
 
 %clean
 rm -rf %{buildroot}
@@ -59,6 +61,7 @@ ln -s /usr/share/patternfly1/resources/ /usr/share/ovirt-engine/ui-plugins/vbspl
 /usr/share/ovirt-engine/ui-plugins/
 /usr/share/ovirt-engine-jboss-as/standalone/deployments/
 /usr/share/ovirt-engine-jboss-as/standalone/configuration/
+/usr/share/engine-vm-backup/
 
 %postun
 unlink /usr/share/ovirt-engine/ui-plugins/vbsplugin-resources/patternfly
