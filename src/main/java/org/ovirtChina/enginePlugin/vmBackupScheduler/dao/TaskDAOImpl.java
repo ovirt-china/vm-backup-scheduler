@@ -39,8 +39,8 @@ public class TaskDAOImpl extends CrudDAO<Task>{
                     rs.getInt("task_status"),
                     rs.getInt("task_type"),
                     rs.getString("backup_name"),
-                    rs.getDate("create_time"),
-                    rs.getDate("last_update"));
+                    rs.getTimestamp("create_time"),
+                    rs.getTimestamp("last_update"));
             }
         };
         entityName = "Task";
