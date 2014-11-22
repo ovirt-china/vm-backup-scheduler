@@ -26,7 +26,7 @@
     <input id="hour" type="text" value="" name="hour">时
     <input id="minute" type="text" value="" name="minute">分
   </div>
-  <div>
+  <div id="weekdays_div">
     <label class="checkbox-inline"><input type="checkbox" id="monday" class="checkbox">星期一</input></label>
     <label class="checkbox-inline"><input type="checkbox" id="tuesday" class="checkbox">星期二</input></label>
     <label class="checkbox-inline"><input type="checkbox" id="wensday" class="checkbox">星期三</input></label>
@@ -98,26 +98,51 @@
         initData($("#backupMethod").val());
     });
 
+    $('#cycle').change(function(){
+      weekDaysDisplay($("#cycle").val() == "week");
+    });
+
+    function weekDaysDisplay(isWeek) {
+      if (isWeek) {
+        $("#weekdays_div").css("display", "block");
+      } else {
+        $("#weekdays_div").css("display", "none");
+      }
+    }
+
     function initData(backupMethod) {
       $.ajax({
         type: "GET",
         url: "/vmBackupScheduler/vmPolicies/" + window.location.href.split("#")[1] + "?backupMethod=" + backupMethod,
         headers: {"Accept":"application/json"},
         success: function(data) {
-          $("#enabled").prop("checked", data["enabled"])
-          $("#cycle").val(data["weekDays"] ? "week" : "day");
-          tmpTimeOfDay = data["timeOfDay"].split(":");
-          $("#hour").val(tmpTimeOfDay[0]);
-          $("#minute").val(tmpTimeOfDay[1]);
-          if (data["weekDays"] != undefined) {
-            setWeekDays(data["weekDays"]);
-          }
-          $('input:radio[name=keepPolicy]').filter("[value=" + data["autoDeleteReservePolicy"] + "]").attr('checked', true);
-          var policyAmount = data["autoDeleteReserveAmount"];
-          if (data["autoDeleteReservePolicy"] == "1") {
-            $("#keepdaynum").val(policyAmount);
-          } else {
-            $("#keepnumnum").val(policyAmount);
+          try {
+            $("#enabled").prop("checked", data["enabled"])
+            var isWeek = data["weekDays"] == "week";
+            $("#cycle").val(isWeek ? "week" : "day");
+            weekDaysDisplay(isWeek);
+            tmpTimeOfDay = data["timeOfDay"].split(":");
+            $("#hour").val(tmpTimeOfDay[0]);
+            $("#minute").val(tmpTimeOfDay[1]);
+            if (data["weekDays"] != undefined) {
+              setWeekDays(data["weekDays"]);
+            }
+            $('input:radio[name=keepPolicy]').filter("[value=" + data["autoDeleteReservePolicy"] + "]").attr('checked', true);
+            var policyAmount = data["autoDeleteReserveAmount"];
+            if (data["autoDeleteReservePolicy"] == "1") {
+              $("#keepdaynum").val(policyAmount);
+            } else {
+              $("#keepnumnum").val(policyAmount);
+            }
+          } catch (e) {
+            $("#enabled").prop("checked", "false");
+            $("#cycle").val("week");
+            $("#hour").val(0);
+            $("#minute").val(0);
+            setWeekDays("0000000");
+            $('input:radio[name=keepPolicy]').filter("[value=0]").attr('checked', true);
+            $("#keepnumnum").val(0);
+            $("#weekdays_div").css("display", "block");
           }
         }
       });
