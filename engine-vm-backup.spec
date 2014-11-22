@@ -56,7 +56,6 @@ ln -s /usr/share/patternfly1/resources/ /usr/share/ovirt-engine/ui-plugins/vbspl
 %files
 %defattr(-,root,root,-)
 %dir /etc/httpd/conf.d/
-%dir /etc/engine-vm-backup/
 %config /etc/httpd/conf.d/z-vm-backup-scheduler-proxy.conf
 %attr(0755,root,root) /usr/sbin/vm-backup-setup
 %attr(0755,root,root) /usr/sbin/vm-backup-cleanup
@@ -65,6 +64,7 @@ ln -s /usr/share/patternfly1/resources/ /usr/share/ovirt-engine/ui-plugins/vbspl
 /usr/share/ovirt-engine-jboss-as/standalone/deployments/
 /usr/share/ovirt-engine-jboss-as/standalone/configuration/
 /usr/share/engine-vm-backup/
+/etc/engine-vm-backup/
 
 %postun
 unlink /usr/share/ovirt-engine/ui-plugins/vbsplugin-resources/patternfly
