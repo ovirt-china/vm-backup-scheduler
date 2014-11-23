@@ -31,7 +31,7 @@ case "$1" in
 		echo -n $"Starting $PROG: "
 		ulimit -n ${FILENO:-65535}
 		touch "${PIDFILE}"
-		status -p "${PIDFILE}" "${NAME}" | grep -q "is running" 
+		status -p "${PIDFILE}" "${NAME}" | grep -q "is running\|正在运行"
 		if [ $? -ne 0 ]; then
 			/usr/share/ovirt-engine-jboss-as/bin/standalone.sh -c engine-vm-backup.xml &> /var/log/engine-vm-backup.log &
 			RETVAL=$?
@@ -39,7 +39,7 @@ case "$1" in
 			sleep 1
 		fi
 		echo -n "                "
-		status -p "${PIDFILE}" "${NAME}" | grep -q "is running" 
+		status -p "${PIDFILE}" "${NAME}" | grep -q "is running\|正在运行"
 		if [ $? -eq 0 ]; then
 			echo -e "[  \033[32mOK\033[0m  ]"
 		else
@@ -48,6 +48,7 @@ case "$1" in
 		;;
 	stop)
 		echo -n $"Stopping $PROG: "
+        /usr/share/ovirt-engine-jboss-as/bin/jboss-cli.sh --connect controller=127.0.0.1:10299 command=:shutdown
 		killproc -p "${PIDFILE}" -d 60
 		RETVAL=$?
 		echo
