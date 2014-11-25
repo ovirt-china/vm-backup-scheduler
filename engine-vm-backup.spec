@@ -29,22 +29,23 @@ mvn clean package war:war
 %install
 rm -rf %{buildroot}
 mkdir -p %{buildroot}/usr/share/ovirt-engine/ui-plugins/
-mkdir -p %{buildroot}/usr/share/engine-vm-backup/
+mkdir -p %{buildroot}/usr/share/engine-vm-backup/deployments
 mkdir -p %{buildroot}/etc/httpd/conf.d/
 mkdir -p %{buildroot}/etc/engine-vm-backup/
-mkdir -p %{buildroot}/usr/share/ovirt-engine-jboss-as/standalone/deployments/
-mkdir -p %{buildroot}/usr/share/ovirt-engine-jboss-as/standalone/configuration/
 mkdir -p %{buildroot}/usr/sbin/
 mkdir -p %{buildroot}/etc/rc.d/init.d/
+mkdir -p %{buildroot}/var/log/engine-vm-backup/
 cp -r dist/UIPlugin/* %{buildroot}/usr/share/ovirt-engine/ui-plugins/
 cp dist/config/z-vm-backup-scheduler-proxy.conf %{buildroot}/etc/httpd/conf.d/
-cp dist/config/engine-vm-backup.xml %{buildroot}/usr/share/ovirt-engine-jboss-as/standalone/configuration
-cp target/vmBackupScheduler.war %{buildroot}/usr/share/ovirt-engine-jboss-as/standalone/deployments/
+cp dist/config/engine-vm-backup.xml %{buildroot}/etc/engine-vm-backup/
+cp target/vmBackupScheduler.war %{buildroot}/usr/share/engine-vm-backup/deployments/
 cp dist/bin/vm-backup-setup %{buildroot}/usr/sbin/
 cp dist/bin/vm-backup-cleanup %{buildroot}/usr/sbin/
 cp dist/service/engine-vm-backup %{buildroot}/etc/rc.d/init.d/
 cp dist/dbscripts/createdb.sql %{buildroot}/usr/share/engine-vm-backup/
 cp dist/config/engine-vm-backup.properties %{buildroot}/etc/engine-vm-backup/
+touch %{buildroot}/etc/engine-vm-backup/mgmt-users.properties
+touch %{buildroot}/etc/engine-vm-backup/application-users.properties
 
 %clean
 rm -rf %{buildroot}
@@ -61,10 +62,9 @@ ln -s /usr/share/patternfly1/resources/ /usr/share/ovirt-engine/ui-plugins/vbspl
 %attr(0755,root,root) /usr/sbin/vm-backup-cleanup
 %attr(0755,root,root) /etc/rc.d/init.d/engine-vm-backup
 /usr/share/ovirt-engine/ui-plugins/
-/usr/share/ovirt-engine-jboss-as/standalone/deployments/
-/usr/share/ovirt-engine-jboss-as/standalone/configuration/
 /usr/share/engine-vm-backup/
 /etc/engine-vm-backup/
+/var/log/engine-vm-backup/
 
 %postun
 unlink /usr/share/ovirt-engine/ui-plugins/vbsplugin-resources/patternfly

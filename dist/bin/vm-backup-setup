@@ -7,7 +7,7 @@ sudo -su engine psql -d ovirtbackup -a -f /usr/share/engine-vm-backup/createdb.s
 echo "Updating db password to vm-backup.xml..."
 . /etc/ovirt-engine/engine.conf.d/10-setup-database.conf
 sed -i "s/<password>.*<\/password>/<password>$ENGINE_DB_PASSWORD<\/password>/"\
- /usr/share/ovirt-engine-jboss-as/standalone/configuration/engine-vm-backup.xml
+ /etc/engine-vm-backup/engine-vm-backup.xml
 
 read -s -p "Please provide password for the engine user admin@internal:" PASSWORD
 sed -i "s/secrete/$PASSWORD/"\

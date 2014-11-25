@@ -23,50 +23,53 @@ PIDFILE="${PIDFILE:-/var/run/${NAME}.pid}"
 
 # See how we were called.
 case "$1" in
-	start)
-		if [ `id -u` -ne 0 ]; then
-			echo $"Insufficient privilege" 1>&2
-			exit 4
-		fi
-		echo -n $"Starting $PROG: "
-		ulimit -n ${FILENO:-65535}
-		touch "${PIDFILE}"
-		status -p "${PIDFILE}" "${NAME}" | grep -q "is running\|正在运行"
-		if [ $? -ne 0 ]; then
-			/usr/share/ovirt-engine-jboss-as/bin/standalone.sh -c engine-vm-backup.xml &> /var/log/engine-vm-backup.log &
-			RETVAL=$?
-			[ $RETVAL -ne 0 -a ! -s "${PIDFILE}" ] && rm -f "${PIDFILE}"
-			sleep 1
-		fi
-		echo -n "                "
-		status -p "${PIDFILE}" "${NAME}" | grep -q "is running\|正在运行"
-		if [ $? -eq 0 ]; then
-			echo -e "[  \033[32mOK\033[0m  ]"
-		else
-			echo -e "\031[32m[FAILED]\033[0m"
-		fi
-		;;
-	stop)
-		echo -n $"Stopping $PROG: "
-        /usr/share/ovirt-engine-jboss-as/bin/jboss-cli.sh --connect controller=127.0.0.1:10299 command=:shutdown
-		killproc -p "${PIDFILE}" -d 60
-		RETVAL=$?
-		echo
-		[ $RETVAL -eq 0 ] && rm -f "${LOCKFILE}"
-		;;
-	status)
-		status -p "${PIDFILE}" "${NAME}"
-		RETVAL=$?
-		;;
-	restart)
-		$0 stop
-		$0 start
-		RETVAL=$?
-		;;
-	*)
-		echo $"Usage: $0 {start|stop|status|restart}"
-		exit 2
-		;;
+    start)
+        if [ `id -u` -ne 0 ]; then
+            echo $"Insufficient privilege" 1>&2
+            exit 4
+        fi
+        echo -n $"Starting $PROG: "
+        ulimit -n ${FILENO:-65535}
+        touch "${PIDFILE}"
+        status -p "${PIDFILE}" "${NAME}" | grep -q "is running\|正在运行"
+        if [ $? -ne 0 ]; then
+            java -server -XX:+TieredCompilation -Xms256m -Xmx512m -XX:PermSize=256m -XX:MaxPermSize=256m -Djava.net.preferIPv4Stack=true -Dsun.rmi.dgc.client.gcInterval=3600000 -Dsun.rmi.dgc.server.gcInterval=3600000 -Djava.awt.headless=true -Djava.util.logging.manager=org.jboss.logmanager -Dorg.jboss.resolver.warning=true -Djboss.modules.system.pkgs=org.jboss.byteman -Djboss.modules.write-indexes=false -Djboss.server.default.config=engine-vm-backup -Djboss.home.dir=/usr/share/ovirt-engine-jboss-as -Djboss.server.base.dir=/usr/share/engine-vm-backup -Djboss.server.log.dir=/var/log/engine-vm-backup -Djboss.server.config.dir=/etc/engine-vm-backup -jar /usr/share/ovirt-engine-jboss-as/jboss-modules.jar -mp /usr/share/ovirt-engine-jboss-as/modules -jaxpmodule javax.xml.jaxp-provider org.jboss.as.standalone -c engine-vm-backup.xml &> /var/log/engine-vm-backup/engine-vm-backup.log &
+            RETVAL=$!
+            echo $! > ${PIDFILE}
+            [ $RETVAL -ne 0 -a ! -s "${PIDFILE}" ] && rm -f "${PIDFILE}"
+            sleep 1
+        fi
+        echo -n "                "
+        status -p "${PIDFILE}" "${NAME}" | grep -q "is running\|正在运行"
+        if [ $? -eq 0 ]; then
+            echo -e "[  \033[32mOK\033[0m  ]"
+        else
+            echo -e "\031[32m[FAILED]\033[0m"
+        fi
+        ;;
+    stop)
+        echo -n $"Stopping $PROG: "
+        killproc -p "${PIDFILE}" -d 60
+        RETVAL=$?
+        echo
+        [ $RETVAL -eq 0 ] && rm -f "${LOCKFILE}"
+        ;;
+    status)
+        source /etc/init.d/functions
+        export LANG=en_US.UTF-8
+        status -p "${PIDFILE}" "${NAME}"
+        RETVAL=$?
+        ;;
+    restart)
+        $0 stop
+        $0 start
+        RETVAL=$?
+        ;;
+    *)
+        echo $"Usage: $0 {start|stop|status|restart}"
+        exit 2
+        ;;
 esac
 
 exit $RETVAL
+
