@@ -16,4 +16,6 @@ sed -i "s/secrete/$PASSWORD/"\
 echo ""
 echo "Adding service to auto start"
 chkconfig --add engine-vm-backup
+echo "Restarting httpd"
+/etc/init.d/httpd restart
 echo "Setup proccess completed."
