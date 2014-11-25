@@ -12,3 +12,8 @@ sed -i "s/<password>.*<\/password>/<password>$ENGINE_DB_PASSWORD<\/password>/"\
 read -s -p "Please provide password for the engine user admin@internal:" PASSWORD
 sed -i "s/secrete/$PASSWORD/"\
  /etc/engine-vm-backup/engine-vm-backup.properties
+
+echo ""
+echo "Adding service to auto start"
+chkconfig --add engine-vm-backup
+echo "Setup proccess completed."

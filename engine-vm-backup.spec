@@ -52,7 +52,6 @@ rm -rf %{buildroot}
 
 %post
 ln -s /usr/share/patternfly1/resources/ /usr/share/ovirt-engine/ui-plugins/vbsplugin-resources/patternfly
-chkconfig --add engine-vm-backup
 
 
 %files
