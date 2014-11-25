@@ -18,4 +18,6 @@ echo "Adding service to auto start"
 chkconfig --add engine-vm-backup
 echo "Restarting httpd"
 /etc/init.d/httpd restart
+echo "Staring service..."
+/etc/rc.d/init.d/engine-vm-backup start
 echo "Setup proccess completed."
