@@ -2,6 +2,12 @@ echo "Creating database..."
 sudo -su postgres createdb -O engine ovirtbackup
 
 echo "Creating tables..."
+if id -u 'engine' >/dev/null 2>&1; then
+    echo "user 'engine' exists"
+else
+    echo "user 'engine' does not exist, creating..."
+    useradd engine
+fi
 sudo -su engine psql -d ovirtbackup -a -f /usr/share/engine-vm-backup/createdb.sql
 
 echo "Updating db password to vm-backup.xml..."
