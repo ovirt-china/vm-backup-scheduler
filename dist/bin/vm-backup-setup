@@ -15,6 +15,10 @@ echo "Updating db password to vm-backup.xml..."
 sed -i "s/<password>.*<\/password>/<password>$ENGINE_DB_PASSWORD<\/password>/"\
  /etc/engine-vm-backup/engine-vm-backup.xml
 
+echo "updating pg_hba.conf..."
+LINENUM=$(grep -n '^local' /var/lib/pgsql/data/pg_hba.conf |cut -f1 -d:)
+sed -i "$((LINENUM+2))ihost    ovirtbackup    engine    0.0.0.0/0    md5" /var/lib/pgsql/data/pg_hba.conf
+
 read -s -p "Please provide password for the engine user admin@internal:" PASSWORD
 sed -i "s/secrete/$PASSWORD/"\
  /etc/engine-vm-backup/engine-vm-backup.properties
@@ -22,8 +26,20 @@ sed -i "s/secrete/$PASSWORD/"\
 echo ""
 echo "Adding service to auto start"
 chkconfig --add engine-vm-backup
+echo "stopping engine"
+/etc/init.d/ovirt-engine stop
+echo "stopping dwh&reports"
+/etc/init.d/ovirt-engine-reportsd stop
+/etc/init.d/ovirt-engine-dwhd stop
+echo "restarting postgresql"
+/etc/init.d/postgresql restart
+echo "starting engine"
+/etc/init.d/ovirt-engine start
+echo "starting dwh&reports"
+/etc/init.d/ovirt-engine-reportsd start
+/etc/init.d/ovirt-engine-dwhd start
 echo "Restarting httpd"
 /etc/init.d/httpd restart
-echo "Staring service..."
+echo "Staring engine-vm-backup service..."
 /etc/rc.d/init.d/engine-vm-backup start
 echo "Setup proccess completed."
