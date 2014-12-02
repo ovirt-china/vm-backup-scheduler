@@ -114,6 +114,19 @@ END; $procedure$
 LANGUAGE plpgsql;
 
 
+CREATE OR REPLACE FUNCTION getAllFinishedTasksForVm(v_id UUID, v_task_type INTEGER)RETURNS SETOF task STABLE
+  AS $procedure$
+BEGIN
+RETURN QUERY SELECT *
+             FROM tasks task
+             WHERE task.id = v_id
+             AND task.task_status = 2
+             AND task.task_type = v_task_type
+             ORDER BY create_time;
+END; $procedure$
+LANGUAGE plpgsql;
+
+
 CREATE OR REPLACE FUNCTION updateTask(v_id UUID,
   v_task_status INTEGER,
   v_task_type INTEGER,
