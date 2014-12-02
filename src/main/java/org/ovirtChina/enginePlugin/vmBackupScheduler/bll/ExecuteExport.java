@@ -43,6 +43,7 @@ public class ExecuteExport extends TimerSDKTask {
                     VM vm = api.getVMs().get(taskToExec.getVmID());
                     if (vm.getStatus().getState().equals("down")) {
                         VM vmCopy = copyVm(vm);
+                        taskToExec.setBackupName(vmCopy.getId());
                         setTaskStatus(taskToExec, TaskStatus.EXECUTING);
                         try{
                             queryVmForDown(vmCopy, "Copying");
@@ -109,6 +110,7 @@ public class ExecuteExport extends TimerSDKTask {
         Action action = new Action();
         action.setVm(copyVm);
         api.getVMs().getById(vm.getId()).clone(action);
+        copyVm.setId(api.getVMs().get(copyVmName).getId());
 
         return copyVm;
     }
