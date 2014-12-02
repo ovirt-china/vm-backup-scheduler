@@ -36,6 +36,15 @@ public class TaskDAOImpl extends CrudDAO<Task>{
                 createIdParametersMapper(vmId).addValue("v_task_type", taskType));
     }
 
+    public void delete(UUID vmId, String backupName) {
+        DbFacade.getInstance().executeModification("deleteTask",
+                createIdParametersMapper(vmId).addValue("v_backup_name", backupName));
+    }
+
+    public void delete(UUID id) {
+        return;
+    }
+
     public TaskDAOImpl() {
         instance = new RowMapper<Task>() {
 

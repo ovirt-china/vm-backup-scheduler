@@ -153,11 +153,13 @@ END; $procedure$
 LANGUAGE plpgsql;
 
 
-CREATE OR REPLACE FUNCTION deleteTask(v_id UUID) RETURNS VOID
+CREATE OR REPLACE FUNCTION deleteTask(v_id UUID, v_backup_name VARCHAR(255)) RETURNS VOID
   AS $procedure$
 BEGIN
-  DELETE FROM tasks
-  WHERE id = v_id;
+  UPDATE tasks
+  SET task_status = 4
+  WHERE id = v_id
+  AND backup_name = v_backup_name;
 END; $procedure$
 LANGUAGE plpgsql;
 
