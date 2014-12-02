@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.TimerTask;
 
 import org.apache.http.client.ClientProtocolException;
-import org.ovirt.engine.sdk.Api;
 import org.ovirt.engine.sdk.decorators.StorageDomain;
 import org.ovirt.engine.sdk.decorators.VM;
 import org.ovirt.engine.sdk.decorators.VMDisk;
@@ -37,7 +36,7 @@ public class ExecuteExport extends TimerSDKTask {
         }
         api = OVirtEngineSDKUtils.getApi();
         if (api != null) {
-            StorageDomain isoDoaminToExport = getIsoDomainToExport(api);
+            StorageDomain isoDoaminToExport = getIsoDomainToExport();
             if (isoDoaminToExport != null) {
                 if (taskToExec.getTaskStatus() == TaskStatus.WAITING.getValue()) {
                     VM vm = api.getVMs().get(taskToExec.getVmID());
@@ -113,15 +112,6 @@ public class ExecuteExport extends TimerSDKTask {
         copyVm.setId(api.getVMs().get(copyVmName).getId());
 
         return copyVm;
-    }
-
-    private StorageDomain getIsoDomainToExport(Api api) throws ClientProtocolException, ServerException, IOException {
-        for (StorageDomain sd : api.getStorageDomains().list()) {
-            if (sd.getType().equals("export")) {
-                return sd;
-            }
-        }
-        return null;
     }
 
 }
