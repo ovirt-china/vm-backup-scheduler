@@ -24,7 +24,7 @@ public class ExecuteSnapshot extends TimerSDKTask {
             taskToExec = DbFacade.getInstance().getTaskDAO().getOldestTaskTypeWithStatus(TaskType.CreateSnapshot, TaskStatus.WAITING);
         }
         if (taskToExec == null) {
-            log.info("There is no snapshot task to execute.");
+            log.debug("There is no snapshot task to execute.");
             return;
         }
         api = OVirtEngineSDKUtils.getApi();

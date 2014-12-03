@@ -31,7 +31,7 @@ public class ExecuteExport extends TimerSDKTask {
             taskToExec = DbFacade.getInstance().getTaskDAO().getOldestTaskTypeWithStatus(TaskType.CreateExport, TaskStatus.WAITING);
         }
         if (taskToExec == null) {
-            log.info("There is no export task to execute.");
+            log.debug("There is no export task to execute.");
             return;
         }
         api = OVirtEngineSDKUtils.getApi();

@@ -31,7 +31,6 @@ public abstract class DeleteSDKTask extends TimerSDKTask {
         if (api != null) {
             List<VM> vms = api.getVMs().list();
             for (VM vm : vms) {
-                log.info("checking old " + BackupMethod.forValue(taskType) + " backup of vm " + vm.getName());
                 List<Task> finishedTasks = DbFacade.getInstance()
                         .getTaskDAO().getAllFinishedTasksForVm(UUID.fromString(vm.getId()), taskType);
                 if (finishedTasks != null && finishedTasks.size() > 0) {
@@ -55,7 +54,7 @@ public abstract class DeleteSDKTask extends TimerSDKTask {
                         }
                     }
                 } else {
-                    log.info("no " + BackupMethod.forValue(taskType) + " backup is needed to be deleted.");
+                    log.debug("no " + BackupMethod.forValue(taskType) + " backup is needed to be deleted.");
                 }
             }
         }
