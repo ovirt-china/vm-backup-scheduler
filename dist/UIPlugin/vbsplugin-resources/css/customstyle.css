@@ -1,0 +1,13 @@
+.row {
+  padding: 5px;
+}
+
+.row-highlight {
+  background-color: #82aa32;
+  color: #fff;
+  padding-bottom:3px;
+}
+
+.row-highlight select {
+  color: #000;
+}
