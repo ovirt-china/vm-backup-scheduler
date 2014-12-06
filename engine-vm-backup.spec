@@ -1,5 +1,5 @@
 %define _version 1.0
-%define _release 1
+%define _release 2
 
 Name:		engine-vm-backup
 Version:	%{_version}
