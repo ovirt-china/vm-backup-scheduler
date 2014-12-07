@@ -40,13 +40,13 @@ public abstract class DeleteSDKTask extends TimerSDKTask {
                         switch (AutoDeleteReservePolicy.forValue(vmPolicy.getAutoDeleteReservePolicy())) {
                         case Quantity:
                             if (finishedTasks.size() > vmPolicy.getAutoDeleteReserveAmount()) {
-                                log.info("deleting vm " + vm.getName() + "'s old " + BackupMethod.forValue(taskType) + " backup " + finishedTasks.get(0).getBackupName());
+                                log.debug("deleting vm " + vm.getName() + "'s old " + BackupMethod.forValue(taskType) + " backup " + finishedTasks.get(0).getBackupName());
                                 deleteTask(finishedTasks.get(0));
                             }
                         case Day:
                             if (finishedTasks.get(0).getCreateTime().getTime() + dayMillis * vmPolicy.getAutoDeleteReserveAmount()
                                     < System.currentTimeMillis()) {
-                                log.info("deleting vm " + vm.getName() + "'s old " + BackupMethod.forValue(taskType) + " backup " + finishedTasks.get(0).getBackupName());
+                                log.debug("deleting vm " + vm.getName() + "'s old " + BackupMethod.forValue(taskType) + " backup " + finishedTasks.get(0).getBackupName());
                                 deleteTask(finishedTasks.get(0));
                             }
                         default:
