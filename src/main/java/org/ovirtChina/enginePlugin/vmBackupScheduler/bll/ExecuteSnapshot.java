@@ -30,7 +30,7 @@ public class ExecuteSnapshot extends TimerSDKTask {
         api = OVirtEngineSDKUtils.getApi();
         if (api != null) {
             if (taskToExec.getTaskStatus() == TaskStatus.WAITING.getValue()) {
-                VM vm = createSnapshot(taskToExec);
+                VM vm = createSnapshot(taskToExec, "Auto Backup");
                 try {
                     querySnapshot(taskToExec, vm);
                 } catch (InterruptedException e) {

@@ -60,11 +60,11 @@ public abstract class TimerSDKTask extends TimerTask {
         }
     }
 
-    protected VM createSnapshot(Task taskToExec) throws ClientProtocolException, ServerException, IOException {
+    protected VM createSnapshot(Task taskToExec, String desc) throws ClientProtocolException, ServerException, IOException {
         Snapshot snap = new Snapshot();
         VM vm = api.getVMs().get(taskToExec.getVmID());
         snap.setVm(vm);
-        snap.setDescription("autoSnap");
+        snap.setDescription(desc);
         String snapshotId = vm.getSnapshots().add(snap).getId();
         taskToExec.setBackupName(snapshotId);
         setTaskStatus(taskToExec, TaskStatus.EXECUTING);

@@ -46,7 +46,7 @@ public class ExecuteExport extends TimerSDKTask {
                     if (vm.getStatus().getState().equals("down")) {
                         vmCopy = copyVm(vm);
                     } else {
-                        VM vmFrom = createSnapshot(taskToExec);
+                        VM vmFrom = createSnapshot(taskToExec, "temp");
                         try {
                             querySnapshot(taskToExec, vmFrom);
                         } catch (InterruptedException e) {
