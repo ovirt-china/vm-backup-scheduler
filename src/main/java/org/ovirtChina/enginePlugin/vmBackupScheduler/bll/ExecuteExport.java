@@ -101,7 +101,7 @@ public class ExecuteExport extends TimerSDKTask {
     private void queryVmForDown(VM vmCopy, String action) throws ClientProtocolException, ServerException, IOException, InterruptedException {
         while(!api.getVMs().get(vmCopy.getName()).getStatus().getState().equals("down")) {
             log.info("vm: " + vmCopy.getName() + " is " + action + ", waiting for next query...");
-            Thread.sleep(1000);
+            Thread.sleep(interval);
         }
         boolean copyingDisks = true;
         while(copyingDisks) {
@@ -111,7 +111,7 @@ public class ExecuteExport extends TimerSDKTask {
                 if(!disk.getStatus().getState().equals("ok")) {
                     copyingDisks = true;
                     log.info("vm: " + vmCopy.getName() + "'s disk " + disk.getName() + " is being cloned, waiting for next query...");
-                    Thread.sleep(5000);
+                    Thread.sleep(interval);
                     break;
                 }
             }

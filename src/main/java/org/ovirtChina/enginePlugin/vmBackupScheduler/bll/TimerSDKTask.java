@@ -14,12 +14,19 @@ import org.ovirt.engine.sdk.exceptions.ServerException;
 import org.ovirtChina.enginePlugin.vmBackupScheduler.common.Task;
 import org.ovirtChina.enginePlugin.vmBackupScheduler.common.TaskStatus;
 import org.ovirtChina.enginePlugin.vmBackupScheduler.dao.DbFacade;
+import org.ovirtChina.enginePlugin.vmBackupScheduler.utils.ConfigProvider;
 import org.slf4j.Logger;
 
 public abstract class TimerSDKTask extends TimerTask {
 
     protected static Logger log;
     protected Api api = null;
+    protected int interval = 10000;
+
+    public TimerSDKTask() {
+        super();
+        interval = Integer.parseInt(ConfigProvider.getConfig().getProperty(ConfigProvider.QUERY_INTERVAL_M));
+    }
 
     @Override
     public void run() {
@@ -56,7 +63,7 @@ public abstract class TimerSDKTask extends TimerTask {
     protected void querySnapshot(Task taskToExec, VM vm) throws ClientProtocolException, ServerException, IOException, InterruptedException {
         while(!api.getVMs().get(UUID.fromString(vm.getId())).getSnapshots().getById(taskToExec.getBackupName()).getSnapshotStatus().equals("ok")) {
             log.info("vm: " + vm.getName() + " is snapshoting, waiting for next query...");
-            Thread.sleep(5000);
+            Thread.sleep(interval);
         }
     }
 
