@@ -60,6 +60,10 @@ public abstract class DeleteSDKTask extends TimerSDKTask {
         }
     }
 
+    protected void deleteTaskRecord(Task task) {
+        DbFacade.getInstance().getTaskDAO().delete(task.getVmID(), task.getBackupName());
+    }
+
     protected abstract void deleteTask(Task task) throws ClientProtocolException, ServerException, IOException;
 
 }

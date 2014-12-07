@@ -7,7 +7,6 @@ import org.ovirt.engine.sdk.decorators.StorageDomain;
 import org.ovirt.engine.sdk.exceptions.ServerException;
 import org.ovirtChina.enginePlugin.vmBackupScheduler.common.Task;
 import org.ovirtChina.enginePlugin.vmBackupScheduler.common.TaskType;
-import org.ovirtChina.enginePlugin.vmBackupScheduler.dao.DbFacade;
 
 public class DeleteExport extends DeleteSDKTask {
 
@@ -19,8 +18,12 @@ public class DeleteExport extends DeleteSDKTask {
     protected void deleteTask(Task task) throws ClientProtocolException, ServerException, IOException {
         StorageDomain isoDoaminToExport = getIsoDomainToExport();
         if (isoDoaminToExport != null) {
-            isoDoaminToExport.getVMs().getById(task.getBackupName()).delete();
-            DbFacade.getInstance().getTaskDAO().delete(task.getVmID(), task.getBackupName());
+            try{
+                isoDoaminToExport.getVMs().getById(task.getBackupName()).delete();
+            } catch (ServerException e) {
+                deleteTaskRecord(task);
+            }
+            deleteTaskRecord(task);
             log.info("delete export: " + task.getBackupName() + " for vm: " + task.getVmID() + " has initiated.");
         }
     }
