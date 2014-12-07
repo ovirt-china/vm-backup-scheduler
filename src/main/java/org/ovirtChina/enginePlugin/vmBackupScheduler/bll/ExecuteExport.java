@@ -12,6 +12,7 @@ import org.ovirt.engine.sdk.decorators.StorageDomain;
 import org.ovirt.engine.sdk.decorators.VM;
 import org.ovirt.engine.sdk.decorators.VMDisk;
 import org.ovirt.engine.sdk.entities.Action;
+import org.ovirt.engine.sdk.entities.Snapshots;
 import org.ovirt.engine.sdk.exceptions.ServerException;
 import org.ovirtChina.enginePlugin.vmBackupScheduler.common.Task;
 import org.ovirtChina.enginePlugin.vmBackupScheduler.common.TaskStatus;
@@ -40,41 +41,61 @@ public class ExecuteExport extends TimerSDKTask {
             if (isoDoaminToExport != null) {
                 if (taskToExec.getTaskStatus() == TaskStatus.WAITING.getValue()) {
                     VM vm = api.getVMs().get(taskToExec.getVmID());
+                    VM vmCopy = null;
+
                     if (vm.getStatus().getState().equals("down")) {
-                        VM vmCopy = copyVm(vm);
-                        taskToExec.setBackupName(vmCopy.getId());
-                        setTaskStatus(taskToExec, TaskStatus.EXECUTING);
-                        try{
-                            queryVmForDown(vmCopy, "Copying");
-                        } catch (Exception e) {
-                            log.error("Error while copying vm: " + vmCopy.getName(), e);
-                            setTaskStatus(taskToExec, TaskStatus.FAILED);
-                            deleteVmCopy(vmCopy);
-                            return;
-                        }
-                        Action action = new Action();
-                        action.setStorageDomain(isoDoaminToExport);
-                        log.info("Start executing task Export for vm: " + vmCopy.getName());
-                        api.getVMs().get(vmCopy.getName()).exportVm(action);
-                        try{
-                            queryVmForDown(vmCopy, "Exporting");
-                        } catch (Exception e) {
-                            log.error("Error while exporting vm: " + vmCopy.getName(), e);
-                            setTaskStatus(taskToExec, TaskStatus.FAILED);
-                            return;
-                        } finally {
-                            deleteVmCopy(vmCopy);
-                        }
-                        setTaskStatus(taskToExec, TaskStatus.FINISHED);
-                        log.info("Execution of task Export for vm: " + vm.getName() + " succeeded.");
+                        vmCopy = copyVm(vm);
                     } else {
-                        setTaskStatus(taskToExec, TaskStatus.FAILED);
-                        log.warn("Exporting vm failed, vm: " + vm.getId() + " is not down.");
+                        VM vmFrom = createSnapshot(taskToExec);
+                        try {
+                            querySnapshot(taskToExec, vmFrom);
+                        } catch (InterruptedException e) {
+                            log.error("Error while snapshoting vm: " + vmFrom.getName(), e);
+                            setTaskStatus(taskToExec, TaskStatus.FAILED);
+                        }
+                        vmCopy = cloneVmFromSnapshot(vmFrom, taskToExec);
                     }
 
+                    taskToExec.setBackupName(vmCopy.getId());
+                    setTaskStatus(taskToExec, TaskStatus.EXECUTING);
+                    try{
+                        queryVmForDown(vmCopy, "Copying");
+                    } catch (Exception e) {
+                        log.error("Error while copying vm: " + vmCopy.getName(), e);
+                        setTaskStatus(taskToExec, TaskStatus.FAILED);
+                        deleteVmCopy(vmCopy);
+                        return;
+                    }
+                    Action action = new Action();
+                    action.setStorageDomain(isoDoaminToExport);
+                    log.info("Start executing task Export for vm: " + vmCopy.getName());
+                    api.getVMs().get(vmCopy.getName()).exportVm(action);
+                    try{
+                        queryVmForDown(vmCopy, "Exporting");
+                    } catch (Exception e) {
+                        log.error("Error while exporting vm: " + vmCopy.getName(), e);
+                        setTaskStatus(taskToExec, TaskStatus.FAILED);
+                        return;
+                    } finally {
+                        deleteVmCopy(vmCopy);
+                    }
+                    setTaskStatus(taskToExec, TaskStatus.FINISHED);
+                    log.info("Execution of task Export for vm: " + vm.getName() + " succeeded.");
                 }
             }
         }
+    }
+
+    private VM cloneVmFromSnapshot(VM vmFrom, Task taskToExec) throws ClientProtocolException, ServerException, IOException {
+        VM clone = new VM(null);
+        clone.setName(getCopyVmNme(vmFrom));
+        clone.setCluster(vmFrom.getCluster());
+        Snapshots snapsshots = new Snapshots();
+        snapsshots.getSnapshots().add(vmFrom.getSnapshots().getById(taskToExec.getBackupName()));
+        clone.setSnapshots(snapsshots);
+        clone = api.getVMs().add(clone);
+        log.info("clone vm from snapshot of vm: " + vmFrom.getId() + " has initiated.");
+        return clone;
     }
 
     private void queryVmForDown(VM vmCopy, String action) throws ClientProtocolException, ServerException, IOException, InterruptedException {
@@ -104,14 +125,19 @@ public class ExecuteExport extends TimerSDKTask {
 
     private VM copyVm(VM vm) throws ClientProtocolException, ServerException, IOException, InterruptedException {
         VM copyVm = new VM(null);
-        String copyVmName = vm.getName() + "_Backup_" + df.format(new Date());
+        String copyVmName = getCopyVmNme(vm);
         copyVm.setName(copyVmName);
         Action action = new Action();
         action.setVm(copyVm);
         api.getVMs().getById(vm.getId()).clone(action);
-        copyVm.setId(api.getVMs().get(copyVmName).getId());
+        copyVm = api.getVMs().get(copyVmName);
+        log.info("copying vm: " + vm.getName() + " for export...");
 
         return copyVm;
+    }
+
+    private String getCopyVmNme(VM vm) {
+        return vm.getName() + "_Backup_" + df.format(new Date());
     }
 
 }
