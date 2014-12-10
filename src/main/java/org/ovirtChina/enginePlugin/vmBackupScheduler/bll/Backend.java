@@ -28,12 +28,13 @@ public class Backend{
             log.error("Error locating datasource.");
         }
         api = getApi();
+        int interval = Integer.parseInt(ConfigProvider.getConfig().getProperty(ConfigProvider.QUERY_INTERVAL_M));
         Timer timer = new Timer();
-        timer.schedule(new FindJobs(), 0, 5000);
-        timer.schedule(new ExecuteSnapshot(api), 1000, 5000);
-        timer.schedule(new ExecuteExport(api), 2000, 5000);
-        timer.schedule(new DeleteExport(api), 3000, 5000);
-        timer.schedule(new DeleteSnapshot(api), 4000, 5000);
+        timer.schedule(new FindJobs(), 0, interval);
+        timer.schedule(new ExecuteSnapshot(api), 1000, interval);
+        timer.schedule(new ExecuteExport(api), 2000, interval);
+        timer.schedule(new DeleteExport(api), 3000, interval);
+        timer.schedule(new DeleteSnapshot(api), 4000, interval);
     }
 
     @PreDestroy
