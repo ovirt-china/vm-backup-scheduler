@@ -3,6 +3,7 @@ package org.ovirtChina.enginePlugin.vmBackupScheduler.bll;
 import java.io.IOException;
 
 import org.apache.http.client.ClientProtocolException;
+import org.ovirt.engine.sdk.Api;
 import org.ovirt.engine.sdk.decorators.StorageDomain;
 import org.ovirt.engine.sdk.exceptions.ServerException;
 import org.ovirtChina.enginePlugin.vmBackupScheduler.common.Task;
@@ -10,8 +11,8 @@ import org.ovirtChina.enginePlugin.vmBackupScheduler.common.TaskType;
 
 public class DeleteExport extends DeleteSDKTask {
 
-    public DeleteExport() {
-        super(TaskType.CreateExport.getValue());
+    public DeleteExport(Api api) {
+        super(api, TaskType.CreateExport.getValue());
     }
 
     @Override

@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.TimerTask;
 
 import org.apache.http.client.ClientProtocolException;
+import org.ovirt.engine.sdk.Api;
 import org.ovirt.engine.sdk.decorators.StorageDomain;
 import org.ovirt.engine.sdk.decorators.VM;
 import org.ovirt.engine.sdk.decorators.VMDisk;
@@ -18,12 +19,16 @@ import org.ovirtChina.enginePlugin.vmBackupScheduler.common.Task;
 import org.ovirtChina.enginePlugin.vmBackupScheduler.common.TaskStatus;
 import org.ovirtChina.enginePlugin.vmBackupScheduler.common.TaskType;
 import org.ovirtChina.enginePlugin.vmBackupScheduler.dao.DbFacade;
-import org.ovirtChina.enginePlugin.vmBackupScheduler.utils.OVirtEngineSDKUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ExecuteExport extends TimerSDKTask {
-    private static Logger log = LoggerFactory.getLogger(TimerTask.class);
+
+    public ExecuteExport(Api api) {
+		super(api);
+	}
+
+	private static Logger log = LoggerFactory.getLogger(TimerTask.class);
     DateFormat df = new SimpleDateFormat("MM-dd-yyyy_HH-mm-ss");
 
     protected void peformAction() throws ClientProtocolException, ServerException, IOException, InterruptedException {
@@ -35,7 +40,6 @@ public class ExecuteExport extends TimerSDKTask {
             log.debug("There is no export task to execute.");
             return;
         }
-        api = OVirtEngineSDKUtils.getApi();
         if (api != null) {
             StorageDomain isoDoaminToExport = getIsoDomainToExport();
             if (isoDoaminToExport != null) {

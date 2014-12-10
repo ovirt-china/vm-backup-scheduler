@@ -20,11 +20,12 @@ import org.slf4j.Logger;
 public abstract class TimerSDKTask extends TimerTask {
 
     protected static Logger log;
-    protected Api api = null;
+    protected static Api api = null;
     protected int interval = 10000;
 
-    public TimerSDKTask() {
+    public TimerSDKTask(Api api1) {
         super();
+        api = api1;
         interval = Integer.parseInt(ConfigProvider.getConfig().getProperty(ConfigProvider.QUERY_INTERVAL_M));
     }
 
@@ -34,14 +35,6 @@ public abstract class TimerSDKTask extends TimerTask {
             peformAction();
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            if (api != null) {
-                try {
-                    api.close();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
         }
     }
 

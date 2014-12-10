@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.apache.http.client.ClientProtocolException;
+import org.ovirt.engine.sdk.Api;
 import org.ovirt.engine.sdk.decorators.VM;
 import org.ovirt.engine.sdk.exceptions.ServerException;
 import org.ovirtChina.enginePlugin.vmBackupScheduler.common.AutoDeleteReservePolicy;
@@ -12,7 +13,6 @@ import org.ovirtChina.enginePlugin.vmBackupScheduler.common.BackupMethod;
 import org.ovirtChina.enginePlugin.vmBackupScheduler.common.Task;
 import org.ovirtChina.enginePlugin.vmBackupScheduler.common.VmPolicy;
 import org.ovirtChina.enginePlugin.vmBackupScheduler.dao.DbFacade;
-import org.ovirtChina.enginePlugin.vmBackupScheduler.utils.OVirtEngineSDKUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,13 +21,13 @@ public abstract class DeleteSDKTask extends TimerSDKTask {
     private static long dayMillis = 1000L * 3600L * 24L;
     int taskType;
 
-    public DeleteSDKTask(int taskType) {
+    public DeleteSDKTask(Api api, int taskType) {
+        super(api);
         this.taskType = taskType;
     }
 
     @Override
     protected void peformAction() throws Exception {
-        api = OVirtEngineSDKUtils.getApi();
         if (api != null) {
             List<VM> vms = api.getVMs().list();
             for (VM vm : vms) {
