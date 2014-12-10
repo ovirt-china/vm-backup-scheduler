@@ -48,9 +48,11 @@ echo "Updating db password to vm-backup.xml..."
 sed -i "s/<password>.*<\/password>/<password>$ENGINE_DB_PASSWORD<\/password>/"\
  /etc/engine-vm-backup/engine-vm-backup.xml
 
-echo "updating pg_hba.conf..."
-LINENUM=$(grep -n '^local' /var/lib/pgsql/data/pg_hba.conf |cut -f1 -d:)
-sed -i "$((LINENUM+2))ihost    ovirtbackup    engine    0.0.0.0/0    md5" /var/lib/pgsql/data/pg_hba.conf
+if ! grep -q ovirtbackup /var/lib/pgsql/data/pg_hba.conf; then
+    echo "updating pg_hba.conf..."
+    LINENUM=$(grep -n '^local' /var/lib/pgsql/data/pg_hba.conf |cut -f1 -d:)
+    sed -i "$((LINENUM+2))ihost    ovirtbackup    engine    0.0.0.0/0    md5" /var/lib/pgsql/data/pg_hba.conf
+fi
 
 sed -i "s/secrete/$PASSWORD/"\
  /etc/engine-vm-backup/engine-vm-backup.properties
