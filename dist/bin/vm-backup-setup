@@ -1,3 +1,36 @@
+#!/bin/bash
+
+usage() {
+    cat << __EOF__
+Usage: $0 [--password=PASSWORD]
+    --password=PASSWORD
+        The admin@internal's password.
+    -h, --help
+    Show this help message.
+
+__EOF__
+    exit 1
+}
+
+x="$1"
+v="${x#*=}"
+shift
+case "${x}" in
+    --password=*)
+        PASSWORD="${v}"
+    ;;
+    --help)
+        usage
+    ;;
+    -h)
+        usage
+    ;;
+    *)
+        usage
+    ;;
+esac
+
+setup() {
 echo "Creating database..."
 sudo -su postgres createdb -O engine ovirtbackup
 
@@ -19,7 +52,6 @@ echo "updating pg_hba.conf..."
 LINENUM=$(grep -n '^local' /var/lib/pgsql/data/pg_hba.conf |cut -f1 -d:)
 sed -i "$((LINENUM+2))ihost    ovirtbackup    engine    0.0.0.0/0    md5" /var/lib/pgsql/data/pg_hba.conf
 
-read -s -p "Please provide password for the engine user admin@internal:" PASSWORD
 sed -i "s/secrete/$PASSWORD/"\
  /etc/engine-vm-backup/engine-vm-backup.properties
 
@@ -43,3 +75,9 @@ echo "Restarting httpd"
 echo "Staring engine-vm-backup service..."
 /etc/rc.d/init.d/engine-vm-backup start
 echo "Setup proccess completed."
+}
+
+if [ ! -z $PASSWORD ]; then
+    setup
+fi
+
