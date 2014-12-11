@@ -60,6 +60,7 @@ setup() {
     echo ""
     echo "Adding service to auto start"
     chkconfig --add engine-vm-backup
+    chkconfig engine-vm-backup on
     echo "stopping engine"
     /etc/init.d/ovirt-engine stop
     echo "stopping dwh&reports"
