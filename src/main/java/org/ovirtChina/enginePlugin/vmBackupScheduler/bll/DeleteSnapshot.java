@@ -9,7 +9,7 @@ import org.ovirt.engine.sdk.exceptions.ServerException;
 import org.ovirtChina.enginePlugin.vmBackupScheduler.common.Task;
 import org.ovirtChina.enginePlugin.vmBackupScheduler.common.TaskType;
 
-public class DeleteSnapshot extends DeleteSDKTask {
+public class DeleteSnapshot extends DeleteOldBackupSDKTask {
 
     public DeleteSnapshot(Api api) {
         super(api, TaskType.CreateSnapshot.getValue());

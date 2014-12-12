@@ -16,12 +16,12 @@ import org.ovirtChina.enginePlugin.vmBackupScheduler.dao.DbFacade;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class DeleteSDKTask extends TimerSDKTask {
-    protected static Logger log = LoggerFactory.getLogger(DeleteSDKTask.class);
+public abstract class DeleteOldBackupSDKTask extends TimerSDKTask {
+    protected static Logger log = LoggerFactory.getLogger(DeleteOldBackupSDKTask.class);
     private static long dayMillis = 1000L * 3600L * 24L;
     int taskType;
 
-    public DeleteSDKTask(Api api, int taskType) {
+    public DeleteOldBackupSDKTask(Api api, int taskType) {
         super(api);
         this.taskType = taskType;
     }

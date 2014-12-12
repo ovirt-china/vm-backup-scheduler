@@ -9,7 +9,7 @@ import org.ovirt.engine.sdk.exceptions.ServerException;
 import org.ovirtChina.enginePlugin.vmBackupScheduler.common.Task;
 import org.ovirtChina.enginePlugin.vmBackupScheduler.common.TaskType;
 
-public class DeleteExport extends DeleteSDKTask {
+public class DeleteExport extends DeleteOldBackupSDKTask {
 
     public DeleteExport(Api api) {
         super(api, TaskType.CreateExport.getValue());
