@@ -64,14 +64,14 @@
         if (data.length > index) {
             element = data[index];
             getServerJson("/ovirt-engine/api/vms/" + element.vmID, function(data1) {
-                weekDaysEmpty = false;
+                weekDaysEmpty = true;
                 if (element.weekDays) {
-                    weekDaysEmpty = true;
+                    weekDaysEmpty = false;
                 }
                 document.getElementById('tableBody').innerHTML += toLine(
                     [data1.name,
                     element.backupMethod==0 ? "增量备份（快照）" : "完全备份（导出）",
-                    weekDaysEmpty ? "按天" : "按星期",
+                    weekDaysEmpty ? "每天" : (getWeekDays(element.weekDays)),
                     element.timeOfDay,
                     element.autoDeleteReservePolicy==0 ? "按备份数量" : "按备份时间（天）",
                     element.autoDeleteReserveAmount],
@@ -79,6 +79,20 @@
                 addTableData(index+1, data);
             }, "GET");
         }
+    }
+
+    function getWeekDays(weekDays) {
+        var value = "";
+        var weekString = ["日","一","二","三","四","五","六"];
+        for (var i=0; i<7; i++) {
+            if (weekDays[i] == "1") {
+                value += weekString[i];
+                if (i < 6) {
+                    value += "、"
+                }
+            }
+        }
+        return value ? "每周" + value.substring(0, value.length-1) : "按周（未指定任何一天）";
     }
 
     function initData(begin, length) {
