@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.TimerTask;
+import java.util.UUID;
 
 import org.apache.http.client.ClientProtocolException;
 import org.ovirt.engine.sdk.Api;
@@ -62,12 +63,18 @@ public class ExecuteExport extends TimerSDKTask {
                         if (vmFrom == null) {
                             return;
                         }
+                        Date now = new Date();
+                        Task deleteTmpTask = new Task(UUID.fromString(vm.getId()), TaskStatus.EXECUTING.getValue(),
+                                TaskType.DeleteTmpSnapshot.getValue(), taskToExec.getBackupName(), now, now);
+                        DbFacade.getInstance().getTaskDAO().save(deleteTmpTask);
                         try {
                             querySnapshot(taskToExec, vmFrom);
                         } catch (InterruptedException e) {
                             log.error("Error while snapshoting vm: " + vmFrom.getName(), e);
+                            setTaskStatus(deleteTmpTask, TaskStatus.FAILED);
                             setTaskStatus(taskToExec, TaskStatus.FAILED);
                         }
+                        setTaskStatus(deleteTmpTask, TaskStatus.FINISHED);
                         vmCopy = cloneVmFromSnapshot(vmFrom, taskToExec);
                     }
 
