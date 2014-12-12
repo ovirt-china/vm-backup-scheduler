@@ -65,7 +65,20 @@ public abstract class TimerSDKTask extends TimerTask {
         VM vm = api.getVMs().get(taskToExec.getVmID());
         snap.setVm(vm);
         snap.setDescription(desc);
-        String snapshotId = vm.getSnapshots().add(snap).getId();
+        String snapshotId = null;
+        try{
+            snapshotId = vm.getSnapshots().add(snap).getId();
+        } catch (ServerException e) {
+            if (new Date().getTime() - taskToExec.getCreateTime().getTime() <
+                    Long.parseLong(ConfigProvider.getConfig().getProperty(ConfigProvider.SNAPSHOT_DELAY_MIN)) * 60000L) {
+                log.warn("snapshot: " + desc + " of vm: " + vm.getName() + " has failed, will try in next schedule.");
+                setTaskStatus(taskToExec, TaskStatus.RETRYING);
+            } else {
+                log.error("snapshot: " + desc + " of vm: " + vm.getName() + " has failed and exceeded delay config, mark as failed.");
+                setTaskStatus(taskToExec, TaskStatus.FAILED);
+            }
+            return null;
+        }
         taskToExec.setBackupName(snapshotId);
         setTaskStatus(taskToExec, TaskStatus.EXECUTING);
         return vm;

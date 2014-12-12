@@ -25,12 +25,19 @@ public class ExecuteSnapshot extends TimerSDKTask {
             taskToExec = DbFacade.getInstance().getTaskDAO().getOldestTaskTypeWithStatus(TaskType.CreateSnapshot, TaskStatus.WAITING);
         }
         if (taskToExec == null) {
+            taskToExec = DbFacade.getInstance().getTaskDAO().getOldestTaskTypeWithStatus(TaskType.CreateSnapshot, TaskStatus.RETRYING);
+        }
+        if (taskToExec == null) {
             log.debug("There is no snapshot task to execute.");
             return;
         }
         if (api != null) {
-            if (taskToExec.getTaskStatus() == TaskStatus.WAITING.getValue()) {
+            if (taskToExec.getTaskStatus() == TaskStatus.WAITING.getValue()
+                    || taskToExec.getTaskStatus() == TaskStatus.RETRYING.getValue()) {
                 VM vm = createSnapshot(taskToExec, "Auto Backup");
+                if (vm == null) {
+                    return;
+                }
                 try {
                     querySnapshot(taskToExec, vm);
                 } catch (InterruptedException e) {

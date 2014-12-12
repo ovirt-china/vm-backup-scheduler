@@ -19,6 +19,7 @@ import org.ovirtChina.enginePlugin.vmBackupScheduler.common.Task;
 import org.ovirtChina.enginePlugin.vmBackupScheduler.common.TaskStatus;
 import org.ovirtChina.enginePlugin.vmBackupScheduler.common.TaskType;
 import org.ovirtChina.enginePlugin.vmBackupScheduler.dao.DbFacade;
+import org.ovirtChina.enginePlugin.vmBackupScheduler.utils.ConfigProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,20 +38,30 @@ public class ExecuteExport extends TimerSDKTask {
             taskToExec = DbFacade.getInstance().getTaskDAO().getOldestTaskTypeWithStatus(TaskType.CreateExport, TaskStatus.WAITING);
         }
         if (taskToExec == null) {
+            taskToExec = DbFacade.getInstance().getTaskDAO().getOldestTaskTypeWithStatus(TaskType.CreateExport, TaskStatus.RETRYING);
+        }
+        if (taskToExec == null) {
             log.debug("There is no export task to execute.");
             return;
         }
         if (api != null) {
             StorageDomain isoDoaminToExport = getIsoDomainToExport();
             if (isoDoaminToExport != null) {
-                if (taskToExec.getTaskStatus() == TaskStatus.WAITING.getValue()) {
+                if (taskToExec.getTaskStatus() == TaskStatus.WAITING.getValue()
+                        || taskToExec.getTaskStatus() == TaskStatus.RETRYING.getValue()) {
                     VM vm = api.getVMs().get(taskToExec.getVmID());
                     VM vmCopy = null;
 
                     if (vm.getStatus().getState().equals("down")) {
-                        vmCopy = copyVm(vm);
+                        vmCopy = copyVm(taskToExec, vm);
+                        if (vmCopy == null) {
+                            return;
+                        }
                     } else {
                         VM vmFrom = createSnapshot(taskToExec, "temp");
+                        if (vmFrom == null) {
+                            return;
+                        }
                         try {
                             querySnapshot(taskToExec, vmFrom);
                         } catch (InterruptedException e) {
@@ -127,13 +138,25 @@ public class ExecuteExport extends TimerSDKTask {
         log.info("vm: " + vmCopy.getName() + " has deleted.");
     }
 
-    private VM copyVm(VM vm) throws ClientProtocolException, ServerException, IOException, InterruptedException {
+    private VM copyVm(Task taskToExec, VM vm) throws ClientProtocolException, ServerException, IOException, InterruptedException {
         VM copyVm = new VM(null);
         String copyVmName = getCopyVmNme(vm);
         copyVm.setName(copyVmName);
         Action action = new Action();
         action.setVm(copyVm);
-        api.getVMs().getById(vm.getId()).clone(action);
+        try{
+            api.getVMs().getById(vm.getId()).clone(action);
+        } catch (ServerException e) {
+            if (new Date().getTime() - taskToExec.getCreateTime().getTime() <
+                    Long.parseLong(ConfigProvider.getConfig().getProperty(ConfigProvider.SNAPSHOT_DELAY_MIN)) * 60000L) {
+                log.warn("clone of vm: " + vm.getName() + " has failed, will try in next schedule.");
+                setTaskStatus(taskToExec, TaskStatus.RETRYING);
+            } else {
+                log.error("clone of vm: " + vm.getName() + " has failed and exceeded delay config, mark as failed.");
+                setTaskStatus(taskToExec, TaskStatus.FAILED);
+            }
+            return null;
+        }
         copyVm = api.getVMs().get(copyVmName);
         log.info("copying vm: " + vm.getName() + " for export...");
 

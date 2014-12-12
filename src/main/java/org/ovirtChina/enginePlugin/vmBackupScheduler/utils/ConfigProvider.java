@@ -14,6 +14,7 @@ public class ConfigProvider {
     public static final String SDK_USER = "engineSdkUser";
     public static final String SDK_PASSWORD = "engineSdkPassword";
     public static final String QUERY_INTERVAL_M = "queryIntervalM";
+    public static final String SNAPSHOT_DELAY_MIN = "snapshotDelayMin";
 
     public static Properties getConfig() {
         if (config == null) {
