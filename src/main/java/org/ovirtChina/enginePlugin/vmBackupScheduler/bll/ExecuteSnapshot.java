@@ -6,6 +6,7 @@ import org.apache.http.client.ClientProtocolException;
 import org.ovirt.engine.sdk.Api;
 import org.ovirt.engine.sdk.decorators.VM;
 import org.ovirt.engine.sdk.exceptions.ServerException;
+import org.ovirtChina.enginePlugin.vmBackupScheduler.common.EngineEventSeverity;
 import org.ovirtChina.enginePlugin.vmBackupScheduler.common.Task;
 import org.ovirtChina.enginePlugin.vmBackupScheduler.common.TaskStatus;
 import org.ovirtChina.enginePlugin.vmBackupScheduler.common.TaskType;
@@ -19,7 +20,7 @@ public class ExecuteSnapshot extends TimerSDKTask {
         log = LoggerFactory.getLogger(ExecuteSnapshot.class);
     }
 
-    protected void peformAction() throws ClientProtocolException, ServerException, IOException {
+    protected void peformAction() throws ClientProtocolException, ServerException, IOException, InterruptedException {
         Task taskToExec = DbFacade.getInstance().getTaskDAO().getOldestTaskTypeWithStatus(TaskType.CreateSnapshot, TaskStatus.EXECUTING);
         if (taskToExec == null) {
             taskToExec = DbFacade.getInstance().getTaskDAO().getOldestTaskTypeWithStatus(TaskType.CreateSnapshot, TaskStatus.WAITING);
@@ -45,6 +46,9 @@ public class ExecuteSnapshot extends TimerSDKTask {
                     setTaskStatus(taskToExec, TaskStatus.FAILED);
                 }
                 setTaskStatus(taskToExec, TaskStatus.FINISHED);
+                String message = "Execution of task Snapshot for vm: " + vm.getName() + " succeeded.";
+                log.info(message);
+                addEngineEvent(EngineEventSeverity.normal, message);
             }
         }
     }

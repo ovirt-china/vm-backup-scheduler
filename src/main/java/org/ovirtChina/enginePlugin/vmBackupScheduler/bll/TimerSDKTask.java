@@ -1,16 +1,19 @@
 package org.ovirtChina.enginePlugin.vmBackupScheduler.bll;
 
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.TimerTask;
 import java.util.UUID;
 
 import org.apache.http.client.ClientProtocolException;
 import org.ovirt.engine.sdk.Api;
+import org.ovirt.engine.sdk.decorators.Event;
 import org.ovirt.engine.sdk.decorators.StorageDomain;
 import org.ovirt.engine.sdk.decorators.VM;
 import org.ovirt.engine.sdk.entities.Snapshot;
 import org.ovirt.engine.sdk.exceptions.ServerException;
+import org.ovirtChina.enginePlugin.vmBackupScheduler.common.EngineEventSeverity;
 import org.ovirtChina.enginePlugin.vmBackupScheduler.common.Task;
 import org.ovirtChina.enginePlugin.vmBackupScheduler.common.TaskStatus;
 import org.ovirtChina.enginePlugin.vmBackupScheduler.dao.DbFacade;
@@ -82,6 +85,40 @@ public abstract class TimerSDKTask extends TimerTask {
         taskToExec.setBackupName(snapshotId);
         setTaskStatus(taskToExec, TaskStatus.EXECUTING);
         return vm;
+    }
+
+    protected void addEngineEvent(EngineEventSeverity severity, String message)
+            throws ClientProtocolException, ServerException, IOException, InterruptedException {
+        addEngineEvent(severity, message, 0);
+    }
+    private void addEngineEvent(EngineEventSeverity severity, String message, int retryCount)
+            throws ClientProtocolException, ServerException, IOException, InterruptedException {
+        Event event = new Event(null);
+        event.setSeverity(severity.name());
+        event.setOrigin("Engine-vm-backup");
+        event.setCustomId(returnSeconds());
+        event.setDescription("Engine-vm-backup: " + message);
+        try{
+            api.getEvents().add(event);
+        } catch (ServerException e) {
+            Thread.sleep(1000);
+            if (retryCount > 3) {
+                log.error("failed to add external event to engine with severity: " + severity.name() + " and message: " + message);
+            }
+            log.debug("retrying adding external event to engine with severity: " + severity.name() + " and message: " + message);
+            addEngineEvent(severity, message, retryCount+1);
+            return;
+        }
+    }
+
+    private static int returnSeconds() {
+        Calendar calendar1 = Calendar.getInstance();
+        calendar1.set(2014, Calendar.DECEMBER, 1);
+        long milliseconds1 = calendar1.getTimeInMillis();
+        long milliseconds2 = System.currentTimeMillis();
+        long diff = milliseconds2 - milliseconds1;
+        long seconds = diff / 1000;
+        return (int) seconds;
     }
 
     protected abstract void peformAction() throws Exception;

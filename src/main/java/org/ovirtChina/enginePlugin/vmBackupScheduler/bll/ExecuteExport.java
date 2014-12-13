@@ -16,6 +16,7 @@ import org.ovirt.engine.sdk.decorators.VMDisk;
 import org.ovirt.engine.sdk.entities.Action;
 import org.ovirt.engine.sdk.entities.Snapshots;
 import org.ovirt.engine.sdk.exceptions.ServerException;
+import org.ovirtChina.enginePlugin.vmBackupScheduler.common.EngineEventSeverity;
 import org.ovirtChina.enginePlugin.vmBackupScheduler.common.Task;
 import org.ovirtChina.enginePlugin.vmBackupScheduler.common.TaskStatus;
 import org.ovirtChina.enginePlugin.vmBackupScheduler.common.TaskType;
@@ -102,7 +103,9 @@ public class ExecuteExport extends TimerSDKTask {
                         deleteVmCopy(vmCopy);
                     }
                     setTaskStatus(taskToExec, TaskStatus.FINISHED);
-                    log.info("Execution of task Export for vm: " + vm.getName() + " succeeded.");
+                    String message = "Execution of task Export for vm: " + vm.getName() + " succeeded.";
+                    log.info(message);
+                    addEngineEvent(EngineEventSeverity.normal, message);
                 }
             }
         }

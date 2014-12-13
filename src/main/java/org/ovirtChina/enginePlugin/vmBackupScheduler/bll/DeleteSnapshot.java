@@ -6,6 +6,7 @@ import org.apache.http.client.ClientProtocolException;
 import org.ovirt.engine.sdk.Api;
 import org.ovirt.engine.sdk.decorators.VM;
 import org.ovirt.engine.sdk.exceptions.ServerException;
+import org.ovirtChina.enginePlugin.vmBackupScheduler.common.EngineEventSeverity;
 import org.ovirtChina.enginePlugin.vmBackupScheduler.common.Task;
 import org.ovirtChina.enginePlugin.vmBackupScheduler.common.TaskType;
 
@@ -16,16 +17,15 @@ public class DeleteSnapshot extends DeleteOldBackupSDKTask {
     }
 
     @Override
-    protected void deleteTask(Task task) throws ClientProtocolException, ServerException, IOException {
+    protected void deleteTask(Task task) throws ClientProtocolException, ServerException, IOException, InterruptedException {
         VM vm = api.getVMs().get(task.getVmID());
         if (vm.getStatus().getState().equals("down")) {
             try{
                 vm.getSnapshots().getById(task.getBackupName()).delete();
             } catch (ServerException e) {
-                deleteTaskRecord(task);
+                deleteTaskRecord(EngineEventSeverity.normal, vm.getName(), task);
             }
-            deleteTaskRecord(task);
-            log.info("delete snapshot: " + task.getBackupName() + " for vm: " + task.getVmID() + " has initiated.");
+            deleteTaskRecord(EngineEventSeverity.normal, vm.getName(), task);
         } else {
             log.debug("cancel deletion of snapshot: " + task.getBackupName() + " for vm: " + task.getVmID() + ", because vm is not down.");
         }
