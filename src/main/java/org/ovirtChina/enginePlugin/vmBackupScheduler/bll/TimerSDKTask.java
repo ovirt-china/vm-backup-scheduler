@@ -104,6 +104,7 @@ public abstract class TimerSDKTask extends TimerTask {
             Thread.sleep(1000);
             if (retryCount > 3) {
                 log.error("failed to add external event to engine with severity: " + severity.name() + " and message: " + message);
+                return;
             }
             log.debug("retrying adding external event to engine with severity: " + severity.name() + " and message: " + message);
             addEngineEvent(severity, message, retryCount+1);
