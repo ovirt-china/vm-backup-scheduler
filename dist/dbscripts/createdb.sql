@@ -108,7 +108,8 @@ RETURN QUERY SELECT *
              FROM tasks task
              WHERE task.id = v_id
              AND (task.task_status = 0
-             OR task.task_status = 1)
+             OR task.task_status = 1
+             OR task.task_status = 5)
              LIMIT 1;
 END; $procedure$
 LANGUAGE plpgsql;
