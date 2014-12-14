@@ -114,7 +114,7 @@ public abstract class TimerSDKTask extends TimerTask {
 
     private static int returnSeconds() {
         Calendar calendar1 = Calendar.getInstance();
-        calendar1.set(2014, Calendar.DECEMBER, 1);
+        calendar1.set(2014, Calendar.DECEMBER, 1, 0, 0, 0);
         long milliseconds1 = calendar1.getTimeInMillis();
         long milliseconds2 = System.currentTimeMillis();
         long diff = milliseconds2 - milliseconds1;
