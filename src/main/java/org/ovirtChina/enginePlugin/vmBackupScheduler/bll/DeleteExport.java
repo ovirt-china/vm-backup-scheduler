@@ -22,13 +22,14 @@ public class DeleteExport extends DeleteOldBackupSDKTask {
         StorageDomain isoDoaminToExport = getIsoDomainToExport();
         StorageDomainVM vm = null;
         if (isoDoaminToExport != null) {
+            String message = "delete CreateExport backup: " + vm.getName() + " for vm: " + api.getVMs().get(task.getVmID()) + " has initiated.";
             try{
                 vm = isoDoaminToExport.getVMs().getById(task.getBackupName());
                 vm.delete();
             } catch (ServerException e) {
-                deleteTaskRecord(EngineEventSeverity.normal, vm.getName(), task);
+                deleteTaskRecord(EngineEventSeverity.normal, message, task);
             }
-            deleteTaskRecord(EngineEventSeverity.normal, vm.getName(), task);
+            deleteTaskRecord(EngineEventSeverity.normal, message, task);
         }
     }
 

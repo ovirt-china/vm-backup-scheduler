@@ -61,8 +61,7 @@ public abstract class DeleteOldBackupSDKTask extends TimerSDKTask {
         }
     }
 
-    protected void deleteTaskRecord(EngineEventSeverity severity, String vmName, Task task) throws ClientProtocolException, ServerException, IOException, InterruptedException {
-        String message = "delete " + BackupMethod.forValue(taskType) + " backup: " + vmName + " for vm: " + api.getVMs().get(task.getVmID()) + " has initiated.";
+    protected void deleteTaskRecord(EngineEventSeverity severity, String message, Task task) throws ClientProtocolException, ServerException, IOException, InterruptedException {
         log.info(message);
         addEngineEvent(severity, message);
         DbFacade.getInstance().getTaskDAO().delete(task.getVmID(), task.getBackupName());

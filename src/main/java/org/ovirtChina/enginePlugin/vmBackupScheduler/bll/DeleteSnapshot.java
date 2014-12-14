@@ -20,12 +20,13 @@ public class DeleteSnapshot extends DeleteOldBackupSDKTask {
     protected void deleteTask(Task task) throws ClientProtocolException, ServerException, IOException, InterruptedException {
         VM vm = api.getVMs().get(task.getVmID());
         if (vm.getStatus().getState().equals("down")) {
+            String message = "delete CreateSnapshot backup for vm: " + vm.getName() + " has initiated.";
             try{
                 vm.getSnapshots().getById(task.getBackupName()).delete();
             } catch (ServerException e) {
-                deleteTaskRecord(EngineEventSeverity.normal, vm.getName(), task);
+                deleteTaskRecord(EngineEventSeverity.normal, message, task);
             }
-            deleteTaskRecord(EngineEventSeverity.normal, vm.getName(), task);
+            deleteTaskRecord(EngineEventSeverity.normal, message, task);
         } else {
             log.debug("cancel deletion of snapshot: " + task.getBackupName() + " for vm: " + task.getVmID() + ", because vm is not down.");
         }
