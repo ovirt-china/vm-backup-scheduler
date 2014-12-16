@@ -72,6 +72,6 @@ unlink /usr/share/ovirt-engine/ui-plugins/vbsplugin-resources/patternfly
 
 %changelog
 
-* Fri Nov 21 2014 MaZhe <liyang.pan@eayun.com> 1.0-1
+* Fri Nov 21 2014 walteryang47 <walteryang47@gmail.com> 1.0-1
 - First build
 
