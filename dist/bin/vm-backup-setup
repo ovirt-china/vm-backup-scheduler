@@ -12,6 +12,14 @@ __EOF__
     exit 1
 }
 
+function isInstalled {
+  if yum list installed "$@" >/dev/null 2>&1; then
+    return 1
+  else
+    return 0
+  fi
+}
+
 x="$1"
 v="${x#*=}"
 shift
@@ -59,28 +67,61 @@ setup() {
 
     echo ""
     echo "Adding service to auto start"
-    chkconfig --add engine-vm-backup
-    chkconfig engine-vm-backup on
+	if [[ ! -z $(pidof systemd) ]]; then
+		systemctl enable engine-vm-backup.service
+	else
+		chkconfig --add engine-vm-backup
+    	chkconfig engine-vm-backup on
+	fi
     echo "stopping engine"
-    /etc/init.d/ovirt-engine stop
+	if [[ ! -z $(pidof systemd) ]]; then
+		systemctl stop ovirt-engine.service
+	else
+		/etc/init.d/ovirt-engine stop
+	fi
     echo "stopping dwh&reports"
-    /etc/init.d/ovirt-engine-reportsd stop
-    /etc/init.d/ovirt-engine-dwhd stop
+	if [[ (! -z $(pidof systemd)) && (isInstalled ovirt-engine-reports) ]]; then
+		systemctl stop ovirt-engine-reportsd.service
+		systemctl stop ovirt-engine-dwhd.service
+	else
+    	/etc/init.d/ovirt-engine-reportsd stop
+    	/etc/init.d/ovirt-engine-dwhd stop
+	fi
     echo "restarting postgresql"
-    /etc/init.d/postgresql restart
+	if [[ ! -z $(pidof systemd) ]]; then
+		systemctl restart postgresql.service
+	else
+    	/etc/init.d/postgresql restart
+	fi
     echo "starting engine"
-    /etc/init.d/ovirt-engine start
+	if [[ ! -z $(pidof systemd) ]]; then
+		systemctl start ovirt-engine.service
+	else
+    	/etc/init.d/ovirt-engine start
+	fi
     echo "starting dwh&reports"
-    /etc/init.d/ovirt-engine-reportsd start
-    /etc/init.d/ovirt-engine-dwhd start
+    if [[ (! -z $(pidof systemd)) && (isInstalled ovirt-engine-reports) ]]; then
+        systemctl start ovirt-engine-reportsd.service
+        systemctl start ovirt-engine-dwhd.service
+    else
+        /etc/init.d/ovirt-engine-reportsd start
+        /etc/init.d/ovirt-engine-dwhd start
+    fi
     echo "Restarting httpd"
-    /etc/init.d/httpd restart
+	if [[ ! -z $(pidof systemd) ]]; then
+		systemctl restart httpd.service
+	else
+    	/etc/init.d/httpd restart
+	fi
     echo "Staring engine-vm-backup service..."
-    /etc/rc.d/init.d/engine-vm-backup start
+	if [[ ! -z $(pidof systemd) ]]; then
+		systemctl start engine-vm-backup.service
+	else
+    	/etc/rc.d/init.d/engine-vm-backup start
+	fi
     echo "Setup proccess completed."
 }
 
 if [ ! -z $PASSWORD ]; then
     setup
 fi
-

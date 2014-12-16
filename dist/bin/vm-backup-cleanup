@@ -1,4 +1,15 @@
-/etc/rc.d/init.d/engine-vm-backup stop
+#!/bin/bash
+
+echo "Removing services from autostart and stopping the service..."
+if [[ ! -z $(pidof systemd) ]]; then
+	systemctl disable engine-vm-backup.service
+	systemctl stop engine-vm-backup.service
+else
+	chkconfig engine-vm-backup off
+	chkconfig --del engine-vm-backup
+	/etc/rc.d/init.d/engine-vm-backup stop
+fi
+
 
 echo "Dropping database..."
 sudo -su postgres dropdb ovirtbackup

@@ -1,0 +1,11 @@
+#/etc/systemd/system/engine-vm-backup.service - vm-backup-scheduler systemd.unit
+[Unit]
+Description=oVirt VM Backup Service
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/java -server -XX:+TieredCompilation -Xms256m -Xmx512m -XX:PermSize=256m -XX:MaxPermSize=256m -Djava.net.preferIPv4Stack=true -Dsun.rmi.dgc.client.gcInterval=3600000 -Dsun.rmi.dgc.server.gcInterval=3600000 -Djava.awt.headless=true -Djava.util.logging.manager=org.jboss.logmanager -Dorg.jboss.resolver.warning=true -Djboss.modules.system.pkgs=org.jboss.byteman -Djboss.modules.write-indexes=false -Djboss.server.default.config=engine-vm-backup -Djboss.home.dir=/usr/share/ovirt-engine-jboss-as -Djboss.server.base.dir=/usr/share/engine-vm-backup -Djboss.server.log.dir=/var/log/engine-vm-backup -Djboss.server.config.dir=/etc/engine-vm-backup -jar /usr/share/ovirt-engine-jboss-as/jboss-modules.jar -mp /usr/share/ovirt-engine-jboss-as/modules:/var/lib/ovirt-engine/jboss_runtime/modules/00-ovirt-engine-modules -jaxpmodule javax.xml.jaxp-provider org.jboss.as.standalone -c engine-vm-backup.xml &> /var/log/engine-vm-backup/engine-vm-backup.log &
+Restart=on-abnormal #If it exits unexpectedly restart the service
+
+[Install]
+WantedBy=multi-user.target #If enabled start with logind
