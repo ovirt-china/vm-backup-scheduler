@@ -25,11 +25,13 @@ public abstract class TimerSDKTask extends TimerTask {
     protected static Logger log;
     protected static Api api = null;
     protected int interval = 10000;
+    protected long taskTimeoutMin = 60L;
 
     public TimerSDKTask(Api api1) {
         super();
         api = api1;
         interval = Integer.parseInt(ConfigProvider.getConfig().getProperty(ConfigProvider.QUERY_INTERVAL_M));
+        taskTimeoutMin = Integer.parseInt(ConfigProvider.getConfig().getProperty(ConfigProvider.TASK_TIMEOUT_MIN));
     }
 
     @Override

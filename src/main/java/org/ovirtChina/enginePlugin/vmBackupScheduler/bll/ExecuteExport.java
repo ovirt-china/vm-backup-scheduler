@@ -45,6 +45,11 @@ public class ExecuteExport extends TimerSDKTask {
         if (taskToExec == null) {
             log.debug("There is no export task to execute.");
             return;
+        } else if (System.currentTimeMillis() - taskToExec.getCreateTime().getTime() > taskTimeoutMin * 60000L) {
+            log.warn("Task: " + TaskType.forValue(taskToExec.getTaskType()) + " for vm: "
+                    + taskToExec.getVmID() + " has timed out, set to failed status.");
+            setTaskStatus(taskToExec, TaskStatus.FAILED);
+            return;
         }
         if (api != null) {
             StorageDomain isoDoaminToExport = getIsoDomainToExport();
