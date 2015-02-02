@@ -3,14 +3,12 @@
 <server xmlns="urn:jboss:domain:1.2">
 
     <extensions>
-        <extension module="org.jboss.as.configadmin"/>
         <extension module="org.jboss.as.connector"/>
         <extension module="org.jboss.as.deployment-scanner"/>
         <extension module="org.jboss.as.ee"/>
         <extension module="org.jboss.as.ejb3"/>
         <extension module="org.jboss.as.jaxrs"/>
         <extension module="org.jboss.as.jmx"/>
-        <extension module="org.jboss.as.jpa"/>
         <extension module="org.jboss.as.logging"/>
         <extension module="org.jboss.as.naming"/>
         <extension module="org.jboss.as.pojo"/>
@@ -54,14 +52,6 @@
                     <pattern-formatter pattern="%d{HH:mm:ss,SSS} %-5p [%c] (%t) %s%E%n"/>
                 </formatter>
             </console-handler>
-            <periodic-rotating-file-handler name="FILE">
-                <formatter>
-                    <pattern-formatter pattern="%d{HH:mm:ss,SSS} %-5p [%c] (%t) %s%E%n"/>
-                </formatter>
-                <file relative-to="jboss.server.log.dir" path="server.log"/>
-                <suffix value=".yyyy-MM-dd"/>
-                <append value="true"/>
-            </periodic-rotating-file-handler>
             <logger category="com.arjuna">
                 <level name="WARN"/>
             </logger>
@@ -81,11 +71,9 @@
                 <level name="INFO"/>
                 <handlers>
                     <handler name="CONSOLE"/>
-                    <handler name="FILE"/>
                 </handlers>
             </root-logger>
         </subsystem>
-        <subsystem xmlns="urn:jboss:domain:configadmin:1.0"/>
         <subsystem xmlns="urn:jboss:domain:datasources:1.0">
             <datasources>
                 <datasource jndi-name="java:jboss/datasources/ExampleDS" pool-name="ExampleDS" enabled="true" use-java-context="true">
@@ -188,9 +176,6 @@
         <subsystem xmlns="urn:jboss:domain:jmx:1.1">
             <show-model value="true"/>
             <remoting-connector/>
-        </subsystem>
-        <subsystem xmlns="urn:jboss:domain:jpa:1.0">
-            <jpa default-datasource=""/>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:naming:1.1"/>
         <subsystem xmlns="urn:jboss:domain:pojo:1.0"/>

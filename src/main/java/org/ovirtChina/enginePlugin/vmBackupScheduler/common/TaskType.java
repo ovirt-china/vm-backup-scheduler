@@ -6,7 +6,8 @@ public enum TaskType {
     CreateSnapshot(0),
     CreateExport(1),
     DeleteSnapshot(2),
-    DeleteExport(3);
+    DeleteExport(3),
+    DeleteTmpSnapshot(4);
 
     private int value;
     private static final HashMap<Integer, TaskType> valueToType = new HashMap<Integer, TaskType>();

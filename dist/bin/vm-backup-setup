@@ -1,45 +1,86 @@
-echo "Creating database..."
-sudo -su postgres createdb -O engine ovirtbackup
+#!/bin/bash
 
-echo "Creating tables..."
-if id -u 'engine' >/dev/null 2>&1; then
-    echo "user 'engine' exists"
-else
-    echo "user 'engine' does not exist, creating..."
-    useradd engine
+usage() {
+    cat << __EOF__
+Usage: $0 [--password=PASSWORD]
+    --password=PASSWORD
+        The admin@internal's password.
+    -h, --help
+    Show this help message.
+
+__EOF__
+    exit 1
+}
+
+x="$1"
+v="${x#*=}"
+shift
+case "${x}" in
+    --password=*)
+        PASSWORD="${v}"
+    ;;
+    --help)
+        usage
+    ;;
+    -h)
+        usage
+    ;;
+    *)
+        usage
+    ;;
+esac
+
+setup() {
+    echo "Creating database..."
+    sudo -su postgres createdb -O engine ovirtbackup
+
+    echo "Creating tables..."
+    if id -u 'engine' >/dev/null 2>&1; then
+        echo "user 'engine' exists"
+    else
+        echo "user 'engine' does not exist, creating..."
+        useradd engine
+    fi
+    sudo -su engine psql -d ovirtbackup -a -f /usr/share/engine-vm-backup/createdb.sql
+
+    echo "Updating db password to vm-backup.xml..."
+    . /etc/ovirt-engine/engine.conf.d/10-setup-database.conf
+    sed -i "s/<password>.*<\/password>/<password>$ENGINE_DB_PASSWORD<\/password>/"\
+     /etc/engine-vm-backup/engine-vm-backup.xml
+
+    if ! grep -q ovirtbackup /var/lib/pgsql/data/pg_hba.conf; then
+        echo "updating pg_hba.conf..."
+        LINENUM=$(grep -n '^local' /var/lib/pgsql/data/pg_hba.conf |cut -f1 -d:)
+        sed -i "$((LINENUM+2))ihost    ovirtbackup    engine    0.0.0.0/0    md5" /var/lib/pgsql/data/pg_hba.conf
+    fi
+
+    sed -i "s/secrete/$PASSWORD/"\
+     /etc/engine-vm-backup/engine-vm-backup.properties
+
+    echo ""
+    echo "Adding service to auto start"
+    chkconfig --add engine-vm-backup
+    chkconfig engine-vm-backup on
+    echo "stopping engine"
+    /etc/init.d/ovirt-engine stop
+    echo "stopping dwh&reports"
+    /etc/init.d/ovirt-engine-reportsd stop
+    /etc/init.d/ovirt-engine-dwhd stop
+    echo "restarting postgresql"
+    /etc/init.d/postgresql restart
+    echo "starting engine"
+    /etc/init.d/ovirt-engine start
+    echo "starting dwh&reports"
+    /etc/init.d/ovirt-engine-reportsd start
+    /etc/init.d/ovirt-engine-dwhd start
+    echo "Restarting httpd"
+    /etc/init.d/httpd restart
+    echo "Staring engine-vm-backup service..."
+    /etc/rc.d/init.d/engine-vm-backup start
+    echo "Setup proccess completed."
+}
+
+if [ ! -z $PASSWORD ]; then
+    setup
 fi
-sudo -su engine psql -d ovirtbackup -a -f /usr/share/engine-vm-backup/createdb.sql
 
-echo "Updating db password to vm-backup.xml..."
-. /etc/ovirt-engine/engine.conf.d/10-setup-database.conf
-sed -i "s/<password>.*<\/password>/<password>$ENGINE_DB_PASSWORD<\/password>/"\
- /etc/engine-vm-backup/engine-vm-backup.xml
-
-echo "updating pg_hba.conf..."
-LINENUM=$(grep -n '^local' /var/lib/pgsql/data/pg_hba.conf |cut -f1 -d:)
-sed -i "$((LINENUM+2))ihost    ovirtbackup    engine    0.0.0.0/0    md5" /var/lib/pgsql/data/pg_hba.conf
-
-read -s -p "Please provide password for the engine user admin@internal:" PASSWORD
-sed -i "s/secrete/$PASSWORD/"\
- /etc/engine-vm-backup/engine-vm-backup.properties
-
-echo ""
-echo "Adding service to auto start"
-chkconfig --add engine-vm-backup
-echo "stopping engine"
-/etc/init.d/ovirt-engine stop
-echo "stopping dwh&reports"
-/etc/init.d/ovirt-engine-reportsd stop
-/etc/init.d/ovirt-engine-dwhd stop
-echo "restarting postgresql"
-/etc/init.d/postgresql restart
-echo "starting engine"
-/etc/init.d/ovirt-engine start
-echo "starting dwh&reports"
-/etc/init.d/ovirt-engine-reportsd start
-/etc/init.d/ovirt-engine-dwhd start
-echo "Restarting httpd"
-/etc/init.d/httpd restart
-echo "Staring engine-vm-backup service..."
-/etc/rc.d/init.d/engine-vm-backup start
-echo "Setup proccess completed."

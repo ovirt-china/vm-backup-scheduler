@@ -1,8 +1,8 @@
 package org.ovirtChina.enginePlugin.vmBackupScheduler.restResource;
 
+import java.util.List;
 import java.util.UUID;
 
-import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -36,11 +36,11 @@ public class VmPolicyResource {
         return addOrUpdateVmPolicy(vmPolicy);
     }
 
-    @DELETE
-    @Path("{id}")
-    public Response removeVmPolicy(@PathParam("id") String id) {
-        DbFacade.getInstance().getVmPolicyDAO().delete(UUID.fromString(id));
-        return Response.status(Response.Status.OK).build();
+    @GET
+    public List<VmPolicy> getPagedVmPolicies(@QueryParam("page") String page) {
+        String[] index = page.split("-");
+        return DbFacade.getInstance().getVmPolicyDAO()
+                .getPagedVmPolicies(Integer.parseInt(index[0]), Integer.parseInt(index[1]));
     }
 
     private Response addOrUpdateVmPolicy(VmPolicy vmPolicy) {

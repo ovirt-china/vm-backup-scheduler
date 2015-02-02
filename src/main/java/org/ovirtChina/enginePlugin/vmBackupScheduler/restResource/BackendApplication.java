@@ -17,7 +17,6 @@ public class BackendApplication extends Application {
     }
 
     public BackendApplication() {
-        singletons.add(new TasksResource());
         singletons.add(new VmPolicyResource());
     }
 

@@ -26,6 +26,11 @@ public class VmPolicyDAOImpl extends CrudDAO<VmPolicy>{
         return null;
     }
 
+    public List<VmPolicy> getPagedVmPolicies(int begin, int size) {
+        return DbFacade.getInstance().executeReadList("getPagedVmPolicies", instance,
+                new MapSqlParameterSource().addValue("v_begin", begin).addValue("v_size", size));
+    }
+
     public VmPolicyDAOImpl() {
         instance = new RowMapper<VmPolicy>() {
 

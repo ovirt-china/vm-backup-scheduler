@@ -7,7 +7,8 @@ public enum TaskStatus {
     EXECUTING(1),
     FINISHED(2),
     FAILED(3),
-    DELETED(4);
+    DELETED(4),
+    RETRYING(5);
 
     private int value;
     private static final HashMap<Integer, TaskStatus> valueToType = new HashMap<Integer, TaskStatus>();

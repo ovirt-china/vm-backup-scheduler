@@ -1,42 +1,49 @@
 package org.ovirtChina.enginePlugin.vmBackupScheduler.bll;
 
 import java.io.IOException;
-import java.util.UUID;
 
 import org.apache.http.client.ClientProtocolException;
+import org.ovirt.engine.sdk.Api;
 import org.ovirt.engine.sdk.decorators.VM;
-import org.ovirt.engine.sdk.entities.Snapshot;
 import org.ovirt.engine.sdk.exceptions.ServerException;
+import org.ovirtChina.enginePlugin.vmBackupScheduler.common.EngineEventSeverity;
 import org.ovirtChina.enginePlugin.vmBackupScheduler.common.Task;
 import org.ovirtChina.enginePlugin.vmBackupScheduler.common.TaskStatus;
 import org.ovirtChina.enginePlugin.vmBackupScheduler.common.TaskType;
 import org.ovirtChina.enginePlugin.vmBackupScheduler.dao.DbFacade;
-import org.ovirtChina.enginePlugin.vmBackupScheduler.utils.OVirtEngineSDKUtils;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ExecuteSnapshot extends TimerSDKTask {
-    private static Logger log = LoggerFactory.getLogger(ExecuteSnapshot.class);
 
-    protected void peformAction() throws ClientProtocolException, ServerException, IOException {
+    public ExecuteSnapshot(Api api) {
+        super(api);
+        log = LoggerFactory.getLogger(ExecuteSnapshot.class);
+    }
+
+    protected void peformAction() throws ClientProtocolException, ServerException, IOException, InterruptedException {
         Task taskToExec = DbFacade.getInstance().getTaskDAO().getOldestTaskTypeWithStatus(TaskType.CreateSnapshot, TaskStatus.EXECUTING);
         if (taskToExec == null) {
             taskToExec = DbFacade.getInstance().getTaskDAO().getOldestTaskTypeWithStatus(TaskType.CreateSnapshot, TaskStatus.WAITING);
         }
         if (taskToExec == null) {
+            taskToExec = DbFacade.getInstance().getTaskDAO().getOldestTaskTypeWithStatus(TaskType.CreateSnapshot, TaskStatus.RETRYING);
+        }
+        if (taskToExec == null) {
             log.debug("There is no snapshot task to execute.");
             return;
+        } else if (System.currentTimeMillis() - taskToExec.getCreateTime().getTime() > taskTimeoutMin * 60000L) {
+            log.warn("Task: " + TaskType.forValue(taskToExec.getTaskType()) + " for vm: "
+                    + taskToExec.getVmID() + " has timed out, set to failed status.");
+            setTaskStatus(taskToExec, TaskStatus.FAILED);
+            return;
         }
-        api = OVirtEngineSDKUtils.getApi();
         if (api != null) {
-            if (taskToExec.getTaskStatus() == TaskStatus.WAITING.getValue()) {
-                Snapshot snap = new Snapshot();
-                VM vm = api.getVMs().get(taskToExec.getVmID());
-                snap.setVm(vm);
-                snap.setDescription("autoSnap");
-                String snapshotId = vm.getSnapshots().add(snap).getId();
-                taskToExec.setBackupName(snapshotId);
-                setTaskStatus(taskToExec, TaskStatus.EXECUTING);
+            if (taskToExec.getTaskStatus() == TaskStatus.WAITING.getValue()
+                    || taskToExec.getTaskStatus() == TaskStatus.RETRYING.getValue()) {
+                VM vm = createSnapshot(taskToExec, "Auto Backup");
+                if (vm == null) {
+                    return;
+                }
                 try {
                     querySnapshot(taskToExec, vm);
                 } catch (InterruptedException e) {
@@ -44,14 +51,10 @@ public class ExecuteSnapshot extends TimerSDKTask {
                     setTaskStatus(taskToExec, TaskStatus.FAILED);
                 }
                 setTaskStatus(taskToExec, TaskStatus.FINISHED);
+                String message = "Execution of task Snapshot for vm: " + vm.getName() + " succeeded.";
+                log.info(message);
+                addEngineEvent(EngineEventSeverity.normal, message);
             }
-        }
-    }
-
-    private void querySnapshot(Task taskToExec, VM vm) throws ClientProtocolException, ServerException, IOException, InterruptedException {
-        while(!api.getVMs().get(UUID.fromString(vm.getId())).getSnapshots().getById(taskToExec.getBackupName()).getSnapshotStatus().equals("ok")) {
-            log.info("vm: " + vm.getName() + " is snapshoting, waiting for next query...");
-            Thread.sleep(5000);
         }
     }
 }
