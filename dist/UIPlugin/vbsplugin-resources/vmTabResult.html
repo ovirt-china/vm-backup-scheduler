@@ -2,6 +2,7 @@
 <html ng-app="resultPage">
 <head>
   <meta charset="utf-8">
+  <link rel="stylesheet" href="dist/css/patternfly.min.css">
   <link rel="stylesheet" href="patternfly/css/patternfly.min.css">
   <link rel="stylesheet" href="css/customstyle.css">
 </head>
@@ -16,46 +17,94 @@
     $('.selectpicker').selectpicker();
   </script>
 
-  <!-- Selection -->
+  <!-- Enable -->
   <div class="row">
-    <div class="col-xs-1">
-      备份策略
+    <div class="col-xs-1" data-localize="backup-title">
+      Backup
+    </div>
+    <div class="col-xs-11">
+      <input id="enabled" type="checkbox"/>
+      <span data-localize="backup-enable">Enable</span>
+    </div>
+  </div>
+
+  <!-- Type -->
+  <div class="row">
+    <div class="col-xs-1" data-localize="type-title">
+      Type
     </div>
     <div class="col-xs-11">
       <select id="backupMethod" class="selectpicker">
-        <option value="0">增量备份（快照）</option>
-        <option value="1">完全备份（导出）</option>
+        <option value="0" data-localize="type-incremental">Incremental (Snapshots)</option>
+        <option value="1" data-localize="type-full">Full (Export)</option>
       </select>
-
-       &nbsp; &nbsp;<input id="enabled" type="checkbox"/>启用
     </div>
   </div>
 
   <!-- Scheduling -->
   <div class="row row-highlight">
-    <div class="col-xs-1">
-      时间计划
+    <div class="col-xs-1" data-localize="schedule-title">
+      Schedule
     </div>
     <div class="col-xs-11">
       <div>
         <div>
-          备份周期：
+          <div data-localize="schedule-intervals">Intervals:</div>
           <select id="cycle" class="selectpicker">
-            <option value="week">每周</option>
-            <option value="day">每天</option>
+            <option value="week" data-localize="schedule-weekly">Weekly</option>
+            <option value="day" data-localize="schedule-daily">Daily</option>
           </select>
-          &nbsp; &nbsp;时间：
-          <input id="hour" type="text" value="" name="hour">时 &nbsp;
-          <input id="minute" type="text" value="" name="minute">分
-        </div>
+
         <div id="weekdays_div">
-          <label class="checkbox-inline"><input type="checkbox" id="monday" class="checkbox">星期一</input></label>
-          <label class="checkbox-inline"><input type="checkbox" id="tuesday" class="checkbox">星期二</input></label>
-          <label class="checkbox-inline"><input type="checkbox" id="wensday" class="checkbox">星期三</input></label>
-          <label class="checkbox-inline"><input type="checkbox" id="thusday" class="checkbox">星期四</input></label>
-          <label class="checkbox-inline"><input type="checkbox" id="friday" class="checkbox">星期五</input></label>
-          <label class="checkbox-inline"><input type="checkbox" id="sartuday" class="checkbox">星期六</input></label>
-          <label class="checkbox-inline"><input type="checkbox" id="sunday" class="checkbox">星期日</input></label>
+          <label class="checkbox-inline">
+            <input type="checkbox" id="monday" class="checkbox">
+            <span data-localize="schedule-monday">Monday</span>
+            </input>
+          </label>
+
+          <label class="checkbox-inline">
+            <input type="checkbox" id="tuesday" class="checkbox">
+            <span data-localize="schedule-tuesday">Tuesday</span>
+            </input>
+          </label>
+
+          <label class="checkbox-inline">
+            <input type="checkbox" id="wensday" class="checkbox">
+            <span data-localize="schedule-wednesday">Wednesday</span>
+            </input>
+          </label>
+
+          <label class="checkbox-inline">
+            <input type="checkbox" id="thusday" class="checkbox">
+            <span data-localize="schedule-thursday">Thursday</span>
+            </input>
+          </label>
+
+          <label class="checkbox-inline">
+            <input type="checkbox" id="friday" class="checkbox">
+            <span data-localize="schedule-friday">Friday</span>
+            </input>
+          </label>
+
+          <label class="checkbox-inline">
+            <input type="checkbox" id="sartuday" class="checkbox">
+            <span data-localize="schedule-saturday">Saturday</span>
+            </input>
+          </label>
+
+          <label class="checkbox-inline">
+            <input type="checkbox" id="sunday" class="checkbox">
+            <span data-localize="schedule-sunday">Sunday</span>
+            </input>
+          </label>
+
+        </div>
+
+          <div data-localize="schedule-time">Time:</div>
+          <input id="hour" type="text" value="" name="hour">
+          <span data-localize="schedule-h">h</span> &nbsp;
+          <input id="minute" type="text" value="" name="minute">
+          <span data-localize="schedule-m">m</span>
         </div>
       </div>
     </div>
@@ -63,24 +112,43 @@
 
     <!-- Limits -->
     <div class="row">
-      <div class="col-xs-1">
-        备份限制
+      <div class="col-xs-1" data-localize="limits-title">
+        Limits
       </div>
       <div class="col-xs-11">
         <div>
-          <label class="radio-inline"><input type="radio" value="0" name="keepPolicy" class="checkbox">保留备份数：</input></label>
-          <label class="text-inline"><input type="text" id="keepnumnum" class="checkbox"></input></label>&nbsp; &nbsp; &nbsp;
-          <label class="radio-inline"><input type="radio" value="1" name="keepPolicy" class="checkbox">保留备份天数：</input></label>
-          <label class="text-inline"><input type="text" id="keepdaynum" class="checkbox"></input></label>
+          <label class="radio-inline">
+            <input type="radio" value="0" name="keepPolicy" class="checkbox" data-localize="limits-title">
+            <span data-localize="limits-number">Number of backups to keep:</span>
+            </input>
+          </label>
+
+          <label class="text-inline">
+            <input type="text" id="keepnumnum" class="checkbox"></input>
+            </label>
+
+          <label class="radio-inline">
+            <input type="radio" value="1" name="keepPolicy" class="checkbox">
+            <span data-localize="limits-time">Delete backups older than (days):</span>
+            </input>
+          </label>
+
+          <label class="text-inline">
+            <input type="text" id="keepdaynum" class="checkbox"></input>
+          </label>
         </div>
       </div>
     </div>
 
     <div class="row">
       <div class="col-xs-11 col-xs-offset-1">
-        <button type="button" class="btn btn-primary" onclick="save()">保存更改</button>
+        <button type="button" class="btn btn-primary" onclick="save()" data-localize="btn-save">Save Changes</button>
       </div>
     </div>
+
+    <script>
+$("[data-localize]").localize("vmTabResult", { skipLanguage: /^en/ });
+  </script>
 
       <script>
         function save() {
