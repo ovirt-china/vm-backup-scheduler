@@ -1,0 +1,54 @@
+{
+  "table-title": "已启用的虚拟机备份策略：",
+
+  "thead-vm": "虚拟机名称",
+  "thead-type": "备份策略",
+  "thead-schedule": "备份周期",
+  "thead-time": "备份时间",
+  "thead-restriction": "备份限制",
+  "thead-limit": "备份限制数",
+
+  "tbody-incremental": "增量备份（快照）",
+  "tbody-full": "完全备份（导出）",
+  "tbody-everyday": "每天",
+  "tbody-number": "按备份数量",
+  "tbody-old": "按备份时间（天）",
+  "tbody-monday": "周一",
+  "tbody-tuesday": "周二",
+  "tbody-wednesday": "周三",
+  "tbody-thursday": "周四",
+  "tbody-friday": "周五",
+  "tbody-saturday": "周六",
+  "tbody-sunday": "周日",
+  "tbody-weeklynoday": "按周（未指定任何一天）",
+  
+
+  "backup-title": "备份",
+  "backup-enable": "启用",
+
+  "type-title": "备份策略",
+  "type-incremental": "增量备份（快照）",
+  "type-full": "完全备份（导出）",
+
+  "schedule-title": "时间计划",
+  "schedule-intervals": "备份周期：",
+  "schedule-weekly": "按周",
+  "schedule-daily": "按天",
+  "schedule-time": "时间：",
+  "schedule-h": "时",
+  "schedule-m": "分",
+  "schedule-monday": "星期一",
+  "schedule-tuesday": "星期二",
+  "schedule-wednesday": "星期三",
+  "schedule-thursday": "星期四",
+  "schedule-friday": "星期五",
+  "schedule-saturday": "星期六",
+  "schedule-sunday": "星期日",
+
+  "limits-title": "备份限制",
+  "limits-number": "保留备份数：",
+  "limits-time": "保留备份天数：",
+
+  "btn-save": "保存更改"
+
+}
