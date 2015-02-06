@@ -48,6 +48,7 @@
         xmlhttp.onreadystatechange = function() {
             if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
                 cfunc(JSON.parse(xmlhttp.responseText));
+                $("[data-localize]").localize("vbsplugin-localization", { skipLanguage: /^en/ });
             }
         }
         xmlhttp.open(method, url, true);
@@ -57,8 +58,11 @@
         xmlhttp.send(data);
     }
 
-    function addTableData(index, data) {
-        if (data.length > index) {
+    function addTableData(indexReq, data) {
+      var index = indexReq
+
+      while (data.length > index) {
+
             element = data[index];
 
             getServerJson("/ovirt-engine/api/vms/" + element.vmID, function(data1) {
@@ -97,8 +101,11 @@
 
 
                 document.getElementById('tableBody').innerHTML += newVMLine;
-                addTableData(index+1, data);
+              //  addTableData(index+1, data);
+
             }, "GET");
+
+            index += 1;
         }
     }
 
@@ -142,11 +149,8 @@
         document.getElementById('pageInfo').innerHTML = i + 1;
         initData(i*10, 10);
     }
-  </script>
 
-  <script>
-    $(document).ready(setTimeout($("[data-localize]").localize("mainTabResult", { skipLanguage: /^en/ }),20000));
-
+    $("[data-localize]").localize("vbsplugin-localization", { skipLanguage: /^en/ });
   </script>
 
 </body>
