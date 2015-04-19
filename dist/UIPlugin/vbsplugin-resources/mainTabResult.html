@@ -36,6 +36,9 @@
             if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
                 cfunc(JSON.parse(xmlhttp.responseText));
             }
+            if (xmlhttp.readyState == 4 && xmlhttp.status == 404) {
+                cfunc(null);
+            }
         }
         xmlhttp.open(method, url, true);
         xmlhttp.setRequestHeader("Accept", "application/json");
@@ -64,18 +67,20 @@
         if (data.length > index) {
             element = data[index];
             getServerJson("/ovirt-engine/api/vms/" + element.vmID, function(data1) {
-                weekDaysEmpty = true;
-                if (element.weekDays) {
-                    weekDaysEmpty = false;
+                if (data1 != null) {
+                    weekDaysEmpty = true;
+                    if (element.weekDays) {
+                        weekDaysEmpty = false;
+                    }
+                    document.getElementById('tableBody').innerHTML += toLine(
+                        [data1.name,
+                        element.backupMethod==0 ? "增量备份（快照）" : "完全备份（导出）",
+                        weekDaysEmpty ? "每天" : (getWeekDays(element.weekDays)),
+                        element.timeOfDay,
+                        element.autoDeleteReservePolicy==0 ? "按备份数量" : "按备份时间（天）",
+                        element.autoDeleteReserveAmount],
+                        false);
                 }
-                document.getElementById('tableBody').innerHTML += toLine(
-                    [data1.name,
-                    element.backupMethod==0 ? "增量备份（快照）" : "完全备份（导出）",
-                    weekDaysEmpty ? "每天" : (getWeekDays(element.weekDays)),
-                    element.timeOfDay,
-                    element.autoDeleteReservePolicy==0 ? "按备份数量" : "按备份时间（天）",
-                    element.autoDeleteReserveAmount],
-                    false);
                 addTableData(index+1, data);
             }, "GET");
         }
