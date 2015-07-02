@@ -8,6 +8,8 @@ import java.util.UUID;
 
 import org.apache.http.client.ClientProtocolException;
 import org.ovirt.engine.sdk.Api;
+import org.ovirt.engine.sdk.decorators.Cluster;
+import org.ovirt.engine.sdk.decorators.DataCenter;
 import org.ovirt.engine.sdk.decorators.Event;
 import org.ovirt.engine.sdk.decorators.StorageDomain;
 import org.ovirt.engine.sdk.decorators.VM;
@@ -49,8 +51,9 @@ public abstract class TimerSDKTask extends TimerTask {
         DbFacade.getInstance().getTaskDAO().update(taskToExec);
     }
 
-    protected StorageDomain getIsoDomainToExport() throws ClientProtocolException, ServerException, IOException {
-        for (StorageDomain sd : api.getStorageDomains().list()) {
+    protected StorageDomain getIsoDomainToExport(VM vm) throws ClientProtocolException, ServerException, IOException {
+        DataCenter dataCenter = api.getDataCenters().getById(api.getClusters().getById(vm.getCluster().getId()).getDataCenter().getId());
+        for (StorageDomain sd : api.getStorageDomains().list("datacenter=" + dataCenter.getName(), true, null)) {
             if (sd.getType().equals("export")) {
                 return sd;
             }

@@ -52,66 +52,71 @@ public class ExecuteExport extends TimerSDKTask {
             return;
         }
         if (api != null) {
-            StorageDomain isoDoaminToExport = getIsoDomainToExport();
-            if (isoDoaminToExport != null) {
-                if (taskToExec.getTaskStatus() == TaskStatus.WAITING.getValue()
-                        || taskToExec.getTaskStatus() == TaskStatus.RETRYING.getValue()) {
-                    VM vm = api.getVMs().get(taskToExec.getVmID());
-                    VM vmCopy = null;
+            if (taskToExec.getTaskStatus() == TaskStatus.WAITING.getValue()
+                    || taskToExec.getTaskStatus() == TaskStatus.RETRYING.getValue()) {
+                VM vm = api.getVMs().get(taskToExec.getVmID());
+                VM vmCopy = null;
 
-                    if (vm.getStatus().getState().equals("down")) {
-                        vmCopy = copyVm(taskToExec, vm);
-                        if (vmCopy == null) {
-                            return;
-                        }
-                    } else {
-                        VM vmFrom = createSnapshot(taskToExec, "temp");
-                        if (vmFrom == null) {
-                            return;
-                        }
-                        Date now = new Date();
-                        Task deleteTmpTask = new Task(UUID.fromString(vm.getId()), TaskStatus.EXECUTING.getValue(),
-                                TaskType.DeleteTmpSnapshot.getValue(), taskToExec.getBackupName(), now, now);
-                        DbFacade.getInstance().getTaskDAO().save(deleteTmpTask);
-                        try {
-                            querySnapshot(taskToExec, vmFrom);
-                        } catch (InterruptedException e) {
-                            log.error("Error while snapshoting vm: " + vmFrom.getName(), e);
-                            setTaskStatus(deleteTmpTask, TaskStatus.FAILED);
-                            setTaskStatus(taskToExec, TaskStatus.FAILED);
-                        }
-                        setTaskStatus(deleteTmpTask, TaskStatus.FINISHED);
-                        vmCopy = cloneVmFromSnapshot(vmFrom, taskToExec);
-                    }
-
-                    taskToExec.setBackupName(vmCopy.getId());
-                    setTaskStatus(taskToExec, TaskStatus.EXECUTING);
-                    try{
-                        queryVmForDown(vmCopy, "Copying");
-                    } catch (Exception e) {
-                        log.error("Error while copying vm: " + vmCopy.getName(), e);
-                        setTaskStatus(taskToExec, TaskStatus.FAILED);
-                        deleteVmCopy(vmCopy);
+                if (vm.getStatus().getState().equals("down")) {
+                    vmCopy = copyVm(taskToExec, vm);
+                    if (vmCopy == null) {
                         return;
                     }
-                    Action action = new Action();
-                    action.setStorageDomain(isoDoaminToExport);
-                    log.info("Start executing task Export for vm: " + vmCopy.getName());
-                    api.getVMs().get(vmCopy.getName()).exportVm(action);
-                    try{
-                        queryVmForDown(vmCopy, "Exporting");
-                    } catch (Exception e) {
-                        log.error("Error while exporting vm: " + vmCopy.getName(), e);
-                        setTaskStatus(taskToExec, TaskStatus.FAILED);
+                } else {
+                    VM vmFrom = createSnapshot(taskToExec, "temp");
+                    if (vmFrom == null) {
                         return;
-                    } finally {
-                        deleteVmCopy(vmCopy);
                     }
-                    setTaskStatus(taskToExec, TaskStatus.FINISHED);
-                    String message = "Execution of task Export for vm: " + vm.getName() + " succeeded.";
-                    log.info(message);
-                    addEngineEvent(EngineEventSeverity.normal, message);
+                    Date now = new Date();
+                    Task deleteTmpTask = new Task(UUID.fromString(vm.getId()), TaskStatus.EXECUTING.getValue(),
+                            TaskType.DeleteTmpSnapshot.getValue(), taskToExec.getBackupName(), now, now);
+                    DbFacade.getInstance().getTaskDAO().save(deleteTmpTask);
+                    try {
+                        querySnapshot(taskToExec, vmFrom);
+                    } catch (InterruptedException e) {
+                        log.error("Error while snapshoting vm: " + vmFrom.getName(), e);
+                        setTaskStatus(deleteTmpTask, TaskStatus.FAILED);
+                        setTaskStatus(taskToExec, TaskStatus.FAILED);
+                    }
+                    setTaskStatus(deleteTmpTask, TaskStatus.FINISHED);
+                    vmCopy = cloneVmFromSnapshot(vmFrom, taskToExec);
                 }
+
+                taskToExec.setBackupName(vmCopy.getId());
+                setTaskStatus(taskToExec, TaskStatus.EXECUTING);
+                try{
+                    queryVmForDown(vmCopy, "Copying");
+                } catch (Exception e) {
+                    log.error("Error while copying vm: " + vmCopy.getName(), e);
+                    setTaskStatus(taskToExec, TaskStatus.FAILED);
+                    deleteVmCopy(vmCopy);
+                    return;
+                }
+                Action action = new Action();
+                action.setStorageDomain(getIsoDomainToExport(vm));
+                if (action.getStorageDomain() == null) {
+                    String message = "There is no export domain in the data center of vm: " + vm.getName() + ", aborting export backup.";
+                    log.error(message);
+                    addEngineEvent(EngineEventSeverity.error, message);
+                    setTaskStatus(taskToExec, TaskStatus.FAILED);
+                    deleteVmCopy(vmCopy);
+                    return;
+                }
+                log.info("Start executing task Export for vm: " + vmCopy.getName());
+                api.getVMs().get(vmCopy.getName()).exportVm(action);
+                try{
+                    queryVmForDown(vmCopy, "Exporting");
+                } catch (Exception e) {
+                    log.error("Error while exporting vm: " + vmCopy.getName(), e);
+                    setTaskStatus(taskToExec, TaskStatus.FAILED);
+                    return;
+                } finally {
+                    deleteVmCopy(vmCopy);
+                }
+                setTaskStatus(taskToExec, TaskStatus.FINISHED);
+                String message = "Execution of task Export for vm: " + vm.getName() + " succeeded.";
+                log.info(message);
+                addEngineEvent(EngineEventSeverity.normal, message);
             }
         }
     }
