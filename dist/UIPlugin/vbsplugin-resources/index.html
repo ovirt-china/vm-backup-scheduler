@@ -24,6 +24,9 @@
                         'plugin/VBSPlugin/vmTabResult.html#'+arguments[0].id);
                 api.setTabAccessible('vm-backup-vm-tab', true);
             }
+        },
+        SystemTreeSelectionChange: function(selectedNode) {
+            api.setTabAccessible('vm-backup-main-tab', selectedNode.type == 'System');
         }
     });
     api.ready();
